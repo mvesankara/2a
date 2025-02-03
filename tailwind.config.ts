@@ -19,6 +19,9 @@ export default {
     },
     extend: {
       colors: {
+        border: {
+          DEFAULT: "hsl(var(--border))",
+        },
         primary: {
           DEFAULT: "#1A4D4F",
           light: "#2A6D6F",
