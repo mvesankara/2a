@@ -13,10 +13,16 @@ const Header = () => {
             className="text-xl font-bold text-primary"
             onClick={() => navigate("/")}
           >
-            Mon Site
+            2A
           </Button>
           
           <div className="flex gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/news")}
+            >
+              Actualités
+            </Button>
             <Button
               variant="ghost"
               onClick={() => navigate("/login")}
