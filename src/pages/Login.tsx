@@ -18,6 +18,7 @@ const Login = () => {
 
   // Redirect if already logged in
   if (user) {
+    console.log("User already logged in, redirecting to dashboard");
     navigate("/dashboard");
     return null;
   }
@@ -40,6 +41,7 @@ const Login = () => {
         });
         setIsResetMode(false);
       } else {
+        console.log("Attempting to sign in...");
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -47,15 +49,19 @@ const Login = () => {
 
         if (error) throw error;
 
-        // Check if profile is complete
+        console.log("Sign in successful, checking profile...");
         const { data: profile } = await supabase
           .from("profiles")
           .select("first_name, last_name")
           .single();
 
+        console.log("Profile data:", profile);
+
         if (!profile?.first_name || !profile?.last_name) {
+          console.log("Profile incomplete, redirecting to profile completion");
           navigate("/profile-completion");
         } else {
+          console.log("Profile complete, redirecting to dashboard");
           navigate("/dashboard");
         }
 
@@ -65,6 +71,7 @@ const Login = () => {
         });
       }
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue",

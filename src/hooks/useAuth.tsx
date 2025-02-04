@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -17,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Vérifier la session actuelle
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Current session:", session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
