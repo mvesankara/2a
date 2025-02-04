@@ -11,6 +11,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -26,29 +27,43 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      // Check if profile is complete
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("first_name, last_name")
-        .single();
-
-      if (!profile?.first_name || !profile?.last_name) {
-        navigate("/profile-completion");
+      if (isResetMode) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Email envoyé",
+          description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
+        });
+        setIsResetMode(false);
       } else {
-        navigate("/dashboard");
-      }
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      toast({
-        title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté",
-      });
+        if (error) throw error;
+
+        // Check if profile is complete
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .single();
+
+        if (!profile?.first_name || !profile?.last_name) {
+          navigate("/profile-completion");
+        } else {
+          navigate("/dashboard");
+        }
+
+        toast({
+          title: "Connexion réussie",
+          description: "Vous êtes maintenant connecté",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -64,9 +79,13 @@ const Login = () => {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-primary">Connexion</h2>
+          <h2 className="text-3xl font-bold text-primary">
+            {isResetMode ? "Réinitialisation du mot de passe" : "Connexion"}
+          </h2>
           <p className="mt-2 text-muted-foreground">
-            Connectez-vous à votre compte
+            {isResetMode
+              ? "Entrez votre email pour réinitialiser votre mot de passe"
+              : "Connectez-vous à votre compte"}
           </p>
         </div>
 
@@ -88,38 +107,60 @@ const Login = () => {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium">
-                Mot de passe
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1"
-                disabled={loading}
-              />
-            </div>
+            {!isResetMode && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium">
+                  Mot de passe
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="mt-1"
+                  disabled={loading}
+                />
+              </div>
+            )}
           </div>
 
           <Button type="submit" className="w-full" size="lg" disabled={loading}>
             <LogIn className="mr-2" />
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading
+              ? isResetMode
+                ? "Envoi en cours..."
+                : "Connexion..."
+              : isResetMode
+              ? "Envoyer le lien"
+              : "Se connecter"}
           </Button>
 
-          <p className="text-center text-sm">
-            Pas encore de compte ?{" "}
+          <div className="flex flex-col space-y-2 text-center text-sm">
             <Button
               variant="link"
-              onClick={() => navigate("/register")}
+              type="button"
+              onClick={() => setIsResetMode(!isResetMode)}
               className="p-0 h-auto font-semibold"
               disabled={loading}
             >
-              S'inscrire
+              {isResetMode
+                ? "Retour à la connexion"
+                : "Mot de passe oublié ?"}
             </Button>
-          </p>
+            
+            <p>
+              Pas encore de compte ?{" "}
+              <Button
+                variant="link"
+                onClick={() => navigate("/register")}
+                className="p-0 h-auto font-semibold"
+                disabled={loading}
+              >
+                S'inscrire
+              </Button>
+            </p>
+          </div>
         </form>
       </div>
     </div>
