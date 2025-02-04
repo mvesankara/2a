@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { LogIn } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,7 +15,7 @@ const Login = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Rediriger si déjà connecté
+  // Redirect if already logged in
   if (user) {
     navigate("/dashboard");
     return null;
@@ -32,25 +31,30 @@ const Login = () => {
         password,
       });
 
-      if (error) {
-        if (error.message === "Invalid login credentials") {
-          throw new Error("Email ou mot de passe incorrect");
-        }
-        throw error;
+      if (error) throw error;
+
+      // Check if profile is complete
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .single();
+
+      if (!profile?.first_name || !profile?.last_name) {
+        navigate("/profile-completion");
+      } else {
+        navigate("/dashboard");
       }
 
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue sur votre espace personnel",
+        description: "Vous êtes maintenant connecté",
       });
-      navigate("/dashboard");
     } catch (error: any) {
       toast({
-        title: "Erreur de connexion",
-        description: error.message || "Une erreur est survenue lors de la connexion",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue",
         variant: "destructive",
       });
-      console.error("Erreur de connexion:", error);
     } finally {
       setLoading(false);
     }
@@ -62,7 +66,7 @@ const Login = () => {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-primary">Connexion</h2>
           <p className="mt-2 text-muted-foreground">
-            Accédez à votre espace personnel
+            Connectez-vous à votre compte
           </p>
         </div>
 

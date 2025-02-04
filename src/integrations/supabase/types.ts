@@ -11,28 +11,138 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          association_contribution: string | null
           avatar_url: string | null
+          city: string | null
+          country: string | null
           created_at: string
           email: string | null
+          first_name: string | null
           full_name: string | null
           id: string
+          invited_by: string | null
+          is_email_verified: boolean | null
+          last_name: string | null
+          personal_description: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          skills: string[] | null
+          status: Database["public"]["Enums"]["profile_status"] | null
           updated_at: string
         }
         Insert: {
+          association_contribution?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id: string
+          invited_by?: string | null
+          is_email_verified?: boolean | null
+          last_name?: string | null
+          personal_description?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          skills?: string[] | null
+          status?: Database["public"]["Enums"]["profile_status"] | null
           updated_at?: string
         }
         Update: {
+          association_contribution?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          invited_by?: string | null
+          is_email_verified?: boolean | null
+          last_name?: string | null
+          personal_description?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          skills?: string[] | null
+          status?: Database["public"]["Enums"]["profile_status"] | null
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_members: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string | null
+          project_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          project_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["project_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["project_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["project_status"] | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -44,7 +154,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      profile_status: "pending" | "approved" | "rejected"
+      project_status: "en_cours" | "cloture"
+      user_role:
+        | "adherent"
+        | "membre_bureau"
+        | "sympathisant"
+        | "administrateur"
     }
     CompositeTypes: {
       [_ in never]: never
