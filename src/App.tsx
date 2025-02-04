@@ -6,6 +6,7 @@ import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 import ProfileCompletion from "@/pages/ProfileCompletion";
 import { Toaster } from "@/components/ui/toaster";
+import PrivateRoute from "@/components/PrivateRoute";
 
 function App() {
   return (
@@ -14,8 +15,14 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile-completion" element={<ProfileCompletion />} />
+        <Route 
+          path="/dashboard" 
+          element={<PrivateRoute element={<Dashboard />} />} 
+        />
+        <Route 
+          path="/profile-completion" 
+          element={<PrivateRoute element={<ProfileCompletion />} />} 
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
