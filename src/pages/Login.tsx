@@ -32,7 +32,12 @@ const Login = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          throw new Error("Email ou mot de passe incorrect");
+        }
+        throw error;
+      }
 
       toast({
         title: "Connexion réussie",
@@ -41,10 +46,11 @@ const Login = () => {
       navigate("/dashboard");
     } catch (error: any) {
       toast({
-        title: "Erreur",
-        description: error.message || "Une erreur est survenue",
+        title: "Erreur de connexion",
+        description: error.message || "Une erreur est survenue lors de la connexion",
         variant: "destructive",
       });
+      console.error("Erreur de connexion:", error);
     } finally {
       setLoading(false);
     }
