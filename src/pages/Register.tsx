@@ -1,27 +1,59 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Register attempt with:", { email, name });
-    
-    // Pour l'instant, simulons une inscription réussie
-    toast({
-      title: "Inscription réussie",
-      description: "Votre compte a été créé avec succès",
-    });
+  // Rediriger si déjà connecté
+  if (user) {
     navigate("/dashboard");
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Inscription réussie",
+        description: "Votre compte a été créé avec succès",
+      });
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +80,7 @@ const Register = () => {
                 required
                 className="mt-1"
                 placeholder="Jean Dupont"
+                disabled={loading}
               />
             </div>
 
@@ -63,6 +96,7 @@ const Register = () => {
                 required
                 className="mt-1"
                 placeholder="vous@exemple.com"
+                disabled={loading}
               />
             </div>
 
@@ -77,13 +111,14 @@ const Register = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="mt-1"
+                disabled={loading}
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg">
+          <Button type="submit" className="w-full" size="lg" disabled={loading}>
             <UserPlus className="mr-2" />
-            S'inscrire
+            {loading ? "Inscription..." : "S'inscrire"}
           </Button>
 
           <p className="text-center text-sm">
@@ -92,6 +127,7 @@ const Register = () => {
               variant="link"
               onClick={() => navigate("/login")}
               className="p-0 h-auto font-semibold"
+              disabled={loading}
             >
               Se connecter
             </Button>
