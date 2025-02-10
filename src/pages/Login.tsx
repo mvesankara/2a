@@ -43,12 +43,12 @@ const Login = () => {
         setIsResetMode(false);
       } else {
         console.log("Attempting to sign in...");
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (signInError) throw signInError;
 
         console.log("Sign in successful, checking profile...");
         // Vérifier si le profil est complet
