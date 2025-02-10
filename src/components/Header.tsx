@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -28,11 +29,6 @@ const Header = () => {
               onClick={() => navigate("/login")}
             >
               Connexion
-            </Button>
-            <Button
-              onClick={() => navigate("/register")}
-            >
-              Inscription
             </Button>
           </div>
         </nav>

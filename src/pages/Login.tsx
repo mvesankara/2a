@@ -50,28 +50,9 @@ const Login = () => {
 
         if (signInError) throw signInError;
 
-        console.log("Sign in successful, checking profile...");
-        // Vérifier si le profil est complet
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("first_name, last_name")
-          .single();
-
-        if (profileError) {
-          console.error("Error fetching profile:", profileError);
-          throw profileError;
-        }
-
-        console.log("Profile data:", profile);
-
-        // Rediriger en fonction de l'état du profil
-        if (!profile?.first_name || !profile?.last_name) {
-          console.log("Profile incomplete, redirecting to profile completion");
-          navigate("/profile-completion");
-        } else {
-          console.log("Profile complete, redirecting to dashboard");
-          navigate("/dashboard");
-        }
+        // Redirection directe vers le dashboard après la connexion
+        console.log("Sign in successful, redirecting to dashboard");
+        navigate("/dashboard");
 
         toast({
           title: "Connexion réussie",
@@ -163,18 +144,6 @@ const Login = () => {
                 ? "Retour à la connexion"
                 : "Mot de passe oublié ?"}
             </Button>
-            
-            <p>
-              Pas encore de compte ?{" "}
-              <Button
-                variant="link"
-                onClick={() => navigate("/register")}
-                className="p-0 h-auto font-semibold"
-                disabled={loading}
-              >
-                S'inscrire
-              </Button>
-            </p>
           </div>
         </form>
       </div>
