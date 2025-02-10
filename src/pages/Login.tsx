@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,12 +16,12 @@ const Login = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Redirect if already logged in
-  if (user) {
-    console.log("User already logged in, redirecting to dashboard");
-    navigate("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      console.log("User already logged in, redirecting to dashboard");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,9 +49,8 @@ const Login = () => {
 
         if (signInError) throw signInError;
 
-        // Redirection directe vers le dashboard après la connexion
         console.log("Sign in successful, redirecting to dashboard");
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
 
         toast({
           title: "Connexion réussie",
