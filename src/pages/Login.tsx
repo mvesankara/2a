@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,13 +51,20 @@ const Login = () => {
         if (error) throw error;
 
         console.log("Sign in successful, checking profile...");
-        const { data: profile } = await supabase
+        // Vérifier si le profil est complet
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("first_name, last_name")
           .single();
 
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          throw profileError;
+        }
+
         console.log("Profile data:", profile);
 
+        // Rediriger en fonction de l'état du profil
         if (!profile?.first_name || !profile?.last_name) {
           console.log("Profile incomplete, redirecting to profile completion");
           navigate("/profile-completion");

@@ -29,7 +29,7 @@ const Register = () => {
 
     try {
       console.log("Starting registration process...");
-      const { error: signUpError, data } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -41,33 +41,14 @@ const Register = () => {
 
       if (signUpError) throw signUpError;
 
-      console.log("Sign up successful, checking profile...");
-      // Vérifier si le profil a été créé
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("first_name, last_name")
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        throw profileError;
-      }
-
-      console.log("Profile data:", profile);
+      // Après l'inscription, rediriger directement vers la page de complétion du profil
+      console.log("Sign up successful, redirecting to profile completion");
+      navigate("/profile-completion");
 
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès",
       });
-
-      // Rediriger vers la page de complétion du profil si le profil est incomplet
-      if (!profile?.first_name || !profile?.last_name) {
-        console.log("Profile incomplete, redirecting to profile completion");
-        navigate("/profile-completion");
-      } else {
-        console.log("Profile complete, redirecting to dashboard");
-        navigate("/dashboard");
-      }
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({
