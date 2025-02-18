@@ -7,25 +7,28 @@ import NotFound from "@/pages/NotFound";
 import ProfileCompletion from "@/pages/ProfileCompletion";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
+import { AuthProvider } from "@/hooks/useAuth";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route 
-          path="/dashboard" 
-          element={<PrivateRoute element={<Dashboard />} />} 
-        />
-        <Route 
-          path="/profile-completion" 
-          element={<PrivateRoute element={<ProfileCompletion />} />} 
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/dashboard" 
+            element={<PrivateRoute element={<Dashboard />} />} 
+          />
+          <Route 
+            path="/profile-completion" 
+            element={<PrivateRoute element={<ProfileCompletion />} />} 
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </AuthProvider>
   );
 }
 
