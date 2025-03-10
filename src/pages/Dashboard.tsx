@@ -1,10 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { User, Settings, LogOut, Bell, FileText, Users, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -27,6 +27,24 @@ const Dashboard = () => {
       });
     }
   };
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  const isAdmin = profile?.role === 'administrateur';
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,8 +70,14 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {isAdmin && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-primary mb-4">Espace Administration</h2>
+            <AdminDashboard />
+          </div>
+        )}
+        
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Profil */}
           <div className="bg-card rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -75,7 +99,6 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Projets */}
           <div className="bg-card rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -93,7 +116,6 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Événements */}
           <div className="bg-card rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-primary/10 p-3 rounded-full">
@@ -111,7 +133,6 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* Communauté */}
           <div className="bg-card rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-primary/10 p-3 rounded-full">
