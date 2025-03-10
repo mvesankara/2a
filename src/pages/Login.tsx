@@ -30,6 +30,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log("Form submitted with:", { email, password, isResetMode, isSignUpMode });
 
     try {
       if (isResetMode) {
@@ -47,7 +48,7 @@ const Login = () => {
       } else if (isSignUpMode) {
         // Inscription
         console.log("Attempting to sign up...");
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -59,6 +60,8 @@ const Login = () => {
           },
         });
 
+        console.log("Sign up response:", { data, error: signUpError });
+
         if (signUpError) throw signUpError;
 
         toast({
@@ -69,10 +72,12 @@ const Login = () => {
       } else {
         // Connexion
         console.log("Attempting to sign in...");
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+
+        console.log("Sign in response:", { data, error: signInError });
 
         if (signInError) throw signInError;
 
@@ -86,9 +91,20 @@ const Login = () => {
       }
     } catch (error: any) {
       console.error("Auth error:", error);
+      
+      // Messages d'erreur plus spécifiques
+      let errorMessage = "Une erreur est survenue";
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Email ou mot de passe incorrect";
+      } else if (error.message.includes("User already registered")) {
+        errorMessage = "Cet email est déjà utilisé. Veuillez vous connecter.";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Veuillez confirmer votre email avant de vous connecter";
+      }
+      
       toast({
         title: "Erreur",
-        description: error.message || "Une erreur est survenue",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
