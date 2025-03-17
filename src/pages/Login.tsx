@@ -34,8 +34,14 @@ const Login = () => {
 
     try {
       if (isResetMode) {
+        // Obtenir l'URL complète y compris protocole et domaine pour la redirection
+        const origin = window.location.origin;
+        const resetRedirectTo = `${origin}/reset-password`;
+        
+        console.log("Sending reset password email with redirect to:", resetRedirectTo);
+        
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: resetRedirectTo,
         });
         
         if (error) throw error;
