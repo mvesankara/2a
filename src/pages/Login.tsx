@@ -88,7 +88,11 @@ const Login = () => {
         if (signInError) throw signInError;
 
         console.log("Sign in successful, redirecting to dashboard");
-        navigate("/dashboard", { replace: true });
+        
+        // Modification ici: s'assurer que la redirection fonctionne correctement
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
 
         toast({
           title: "Connexion réussie",
