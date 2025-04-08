@@ -6,6 +6,9 @@ import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 import ProfileCompletion from "@/pages/ProfileCompletion";
 import ResetPassword from "@/pages/ResetPassword";
+import Payment from "@/pages/Payment";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCanceled from "@/pages/PaymentCanceled";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -25,6 +28,18 @@ function App() {
           <Route 
             path="/profile-completion" 
             element={<PrivateRoute element={<ProfileCompletion />} />} 
+          />
+          <Route 
+            path="/payment" 
+            element={<PrivateRoute element={<Payment />} />} 
+          />
+          <Route 
+            path="/payment-success" 
+            element={<PrivateRoute element={<PaymentSuccess />} />} 
+          />
+          <Route 
+            path="/payment-canceled" 
+            element={<PrivateRoute element={<PaymentCanceled />} />} 
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
