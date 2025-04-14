@@ -95,9 +95,9 @@ const Dashboard = () => {
             <Button 
               variant="outline" 
               className="w-full"
-              onClick={() => navigate("/profile-completion")}
+              onClick={() => navigate("/profile")}
             >
-              Compléter mon profil
+              Voir mon profil
             </Button>
           </div>
 

@@ -9,6 +9,7 @@ import ResetPassword from "@/pages/ResetPassword";
 import Payment from "@/pages/Payment";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
+import UserProfile from "@/pages/UserProfile";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -24,6 +25,10 @@ function App() {
           <Route 
             path="/dashboard" 
             element={<PrivateRoute element={<Dashboard />} />} 
+          />
+          <Route 
+            path="/profile" 
+            element={<PrivateRoute element={<UserProfile />} />} 
           />
           <Route 
             path="/profile-completion" 
