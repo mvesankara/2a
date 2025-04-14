@@ -13,44 +13,57 @@ import UserProfile from "@/pages/UserProfile";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Création d'un nouveau client de requête pour React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route 
-            path="/dashboard" 
-            element={<PrivateRoute element={<Dashboard />} />} 
-          />
-          <Route 
-            path="/profile" 
-            element={<PrivateRoute element={<UserProfile />} />} 
-          />
-          <Route 
-            path="/profile-completion" 
-            element={<PrivateRoute element={<ProfileCompletion />} />} 
-          />
-          <Route 
-            path="/payment" 
-            element={<PrivateRoute element={<Payment />} />} 
-          />
-          <Route 
-            path="/payment-success" 
-            element={<PrivateRoute element={<PaymentSuccess />} />} 
-          />
-          <Route 
-            path="/payment-canceled" 
-            element={<PrivateRoute element={<PaymentCanceled />} />} 
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route 
+              path="/dashboard" 
+              element={<PrivateRoute element={<Dashboard />} />} 
+            />
+            <Route 
+              path="/profile" 
+              element={<PrivateRoute element={<UserProfile />} />} 
+            />
+            <Route 
+              path="/profile-completion" 
+              element={<PrivateRoute element={<ProfileCompletion />} />} 
+            />
+            <Route 
+              path="/payment" 
+              element={<PrivateRoute element={<Payment />} />} 
+            />
+            <Route 
+              path="/payment-success" 
+              element={<PrivateRoute element={<PaymentSuccess />} />} 
+            />
+            <Route 
+              path="/payment-canceled" 
+              element={<PrivateRoute element={<PaymentCanceled />} />} 
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

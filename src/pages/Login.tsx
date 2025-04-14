@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +94,10 @@ const Login = () => {
           description: "Vous êtes maintenant connecté",
         });
         
-        navigate("/dashboard", { replace: true });
+        // Utilisez setTimeout pour s'assurer que la redirection fonctionne après que l'état soit mis à jour
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
