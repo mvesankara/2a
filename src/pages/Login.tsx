@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,15 +88,12 @@ const Login = () => {
 
         console.log("Sign in successful, redirecting to dashboard");
         
-        // Modification ici: s'assurer que la redirection fonctionne correctement
-        setTimeout(() => {
-          navigate("/dashboard", { replace: true });
-        }, 100);
-
         toast({
           title: "Connexion réussie",
           description: "Vous êtes maintenant connecté",
         });
+        
+        navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {
       console.error("Auth error:", error);

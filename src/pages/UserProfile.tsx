@@ -271,23 +271,14 @@ const UserProfile = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-muted-foreground">
-                    {profile?.subscription_status === "active" 
-                      ? "Adhérent(e) actif" 
-                      : "Adhésion non active"}
+                    Adhésion non active
                   </p>
-                  {profile?.subscription_status === "active" && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Renouvellement prévu: {new Date(profile?.subscription_end_date || "").toLocaleDateString()}
-                    </p>
-                  )}
                 </div>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/payment")}
                 >
-                  {profile?.subscription_status === "active"
-                    ? "Gérer mon adhésion"
-                    : "Devenir adhérent(e)"}
+                  Devenir adhérent(e)
                 </Button>
               </div>
             </Card>
