@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 export type ProfileFormData = {
   firstName: string;
   lastName: string;
+  email: string;
   city: string;
   country: string;
   personalDescription: string;
@@ -23,6 +23,7 @@ export const useProfileForm = () => {
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
     lastName: "",
+    email: "",
     city: "",
     country: "",
     personalDescription: "",
@@ -56,6 +57,7 @@ export const useProfileForm = () => {
           setFormData({
             firstName: profile.first_name || "",
             lastName: profile.last_name || "",
+            email: user.email || "",
             city: profile.city || "",
             country: profile.country || "",
             personalDescription: profile.personal_description || "",
@@ -103,6 +105,7 @@ export const useProfileForm = () => {
         .update({
           first_name: formData.firstName,
           last_name: formData.lastName,
+          email: formData.email,
           city: formData.city,
           country: formData.country,
           personal_description: formData.personalDescription,
