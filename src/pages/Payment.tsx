@@ -6,16 +6,28 @@ import { usePayment } from "@/hooks/usePayment";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, CreditCard, CalendarClock } from "lucide-react";
 
+/**
+ * Page de paiement pour l'adhésion à l'association
+ * Offre deux options : paiement unique ou abonnement mensuel
+ * @returns Le composant Payment
+ */
 const Payment = () => {
   const { loading, status, hasCheckedStatus, checkPaymentStatus, createPaymentSession } = usePayment();
   const { user } = useAuth();
 
+  /**
+   * Effect qui vérifie le statut de paiement de l'utilisateur à l'initialisation
+   */
   useEffect(() => {
     if (user && !hasCheckedStatus) {
       checkPaymentStatus();
     }
   }, [user, hasCheckedStatus]);
 
+  /**
+   * Crée une session de paiement selon le type choisi
+   * @param type - Le type de paiement ("one_time" ou "subscription")
+   */
   const handlePayment = async (type: "one_time" | "subscription") => {
     await createPaymentSession(type);
   };

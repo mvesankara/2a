@@ -7,6 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
+/**
+ * Page de réinitialisation du mot de passe
+ * Accessible via un lien envoyé par email
+ * @returns Le composant ResetPassword
+ */
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,6 +20,9 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  /**
+   * Effect qui vérifie si la session de réinitialisation est valide
+   */
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -46,6 +54,10 @@ const ResetPassword = () => {
     checkSession();
   }, [navigate, toast]);
 
+  /**
+   * Gère la soumission du formulaire de réinitialisation
+   * @param e - L'événement de soumission du formulaire
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     

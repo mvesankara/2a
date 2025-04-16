@@ -1,9 +1,13 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+/**
+ * Type définissant la structure des données du formulaire de profil
+ */
 export type ProfileFormData = {
   firstName: string;
   lastName: string;
@@ -15,6 +19,11 @@ export type ProfileFormData = {
   skills: string;
 };
 
+/**
+ * Hook personnalisé gérant la logique du formulaire de profil
+ * Responsable du chargement des données, des modifications et de la soumission du profil
+ * @returns Un objet contenant les données du formulaire, l'état de chargement et les fonctions de gestion
+ */
 export const useProfileForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -31,6 +40,10 @@ export const useProfileForm = () => {
     skills: "",
   });
 
+  /**
+   * Effect qui charge les données du profil utilisateur depuis Supabase
+   * S'exécute une fois au chargement du composant
+   */
   useEffect(() => {
     const loadProfile = async () => {
       if (!user) {
@@ -78,6 +91,10 @@ export const useProfileForm = () => {
     loadProfile();
   }, [user, navigate, toast]);
 
+  /**
+   * Gère les changements dans les champs du formulaire
+   * @param e - L'événement de changement du champ
+   */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -85,6 +102,11 @@ export const useProfileForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Gère la soumission du formulaire
+   * Envoie les données mises à jour à Supabase
+   * @param e - L'événement de soumission du formulaire
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {

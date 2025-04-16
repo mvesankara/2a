@@ -5,15 +5,28 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Interface définissant les propriétés du composant ResetPasswordForm
+ */
 interface ResetPasswordFormProps {
   onCancel: () => void;
 }
 
+/**
+ * Formulaire de demande de réinitialisation de mot de passe
+ * Envoie un email avec un lien de réinitialisation
+ * @param props - Les propriétés du composant
+ * @returns Le composant ResetPasswordForm
+ */
 const ResetPasswordForm = ({ onCancel }: ResetPasswordFormProps) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  /**
+   * Gère l'envoi du formulaire de réinitialisation
+   * @param e - L'événement de soumission du formulaire
+   */
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

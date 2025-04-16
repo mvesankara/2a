@@ -15,7 +15,10 @@ import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Création d'un nouveau client de requête pour React Query
+/**
+ * Création d'un nouveau client de requête pour React Query
+ * Configuration des options par défaut pour les requêtes
+ */
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,6 +28,11 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * Composant principal de l'application
+ * Définit toutes les routes et les fournisseurs globaux
+ * @returns Le composant App
+ */
 function App() {
   return (
     <QueryClientProvider client={queryClient}>

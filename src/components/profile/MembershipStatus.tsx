@@ -2,6 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Composant affichant le statut d'adhésion de l'utilisateur
+ * et offrant la possibilité de devenir adhérent
+ * @returns Le composant MembershipStatus
+ */
 export const MembershipStatus = () => {
   const navigate = useNavigate();
 

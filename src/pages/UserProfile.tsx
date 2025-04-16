@@ -6,6 +6,12 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { MembershipStatus } from "@/components/profile/MembershipStatus";
 import { useProfileData } from "@/hooks/useProfileData";
 
+/**
+ * Page du profil utilisateur
+ * Affiche et permet de modifier les informations de l'utilisateur
+ * Indique également le statut d'adhésion
+ * @returns Le composant UserProfile
+ */
 const UserProfile = () => {
   const { formData, loading, profileLoading, handleChange, handleSubmit } = useProfileData();
 

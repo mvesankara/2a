@@ -5,12 +5,20 @@ import { Button } from "@/components/ui/button";
 import { usePayment } from "@/hooks/usePayment";
 import { CheckCircle2 } from "lucide-react";
 
+/**
+ * Page affichée après un paiement réussi
+ * Adapte son contenu selon le type de paiement (abonnement ou paiement unique)
+ * @returns Le composant PaymentSuccess
+ */
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { checkPaymentStatus } = usePayment();
   const [paymentType, setPaymentType] = useState<string>("payment");
 
+  /**
+   * Effect qui rafraîchit le statut de paiement et récupère le type de paiement depuis l'URL
+   */
   useEffect(() => {
     // Rafraîchir le statut de paiement
     checkPaymentStatus();

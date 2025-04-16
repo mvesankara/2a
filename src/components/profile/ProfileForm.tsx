@@ -5,6 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Save } from "lucide-react";
 
+/**
+ * Interface définissant la structure des données du formulaire de profil
+ */
 interface ProfileFormData {
   firstName: string;
   lastName: string;
@@ -15,6 +18,9 @@ interface ProfileFormData {
   skills: string;
 }
 
+/**
+ * Interface définissant les propriétés du composant ProfileForm
+ */
 interface ProfileFormProps {
   formData: ProfileFormData;
   loading: boolean;
@@ -22,6 +28,12 @@ interface ProfileFormProps {
   handleSubmit: (e: React.FormEvent) => void;
 }
 
+/**
+ * Formulaire d'édition du profil utilisateur
+ * Permet de modifier les informations personnelles, la localisation et les compétences
+ * @param props - Les propriétés du composant
+ * @returns Le composant ProfileForm
+ */
 export const ProfileForm = ({
   formData,
   loading,

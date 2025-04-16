@@ -7,11 +7,20 @@ import { LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Interface définissant les propriétés du composant LoginForm
+ */
 interface LoginFormProps {
   onToggleMode: () => void;
   onToggleReset: () => void;
 }
 
+/**
+ * Formulaire de connexion
+ * Permet à l'utilisateur de se connecter avec son email et mot de passe
+ * @param props - Les propriétés du composant
+ * @returns Le composant LoginForm
+ */
 const LoginForm = ({ onToggleMode, onToggleReset }: LoginFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +28,10 @@ const LoginForm = ({ onToggleMode, onToggleReset }: LoginFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  /**
+   * Gère la soumission du formulaire de connexion
+   * @param e - L'événement de soumission du formulaire
+   */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

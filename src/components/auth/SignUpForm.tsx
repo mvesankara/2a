@@ -6,10 +6,19 @@ import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Interface définissant les propriétés du composant SignUpForm
+ */
 interface SignUpFormProps {
   onToggleMode: () => void;
 }
 
+/**
+ * Formulaire d'inscription
+ * Permet à un nouvel utilisateur de créer un compte
+ * @param props - Les propriétés du composant
+ * @returns Le composant SignUpForm
+ */
 const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +27,10 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  /**
+   * Gère la soumission du formulaire d'inscription
+   * @param e - L'événement de soumission du formulaire
+   */
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

@@ -1,9 +1,17 @@
+
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+/**
+ * Page d'actualités qui affiche les dernières actions et nouvelles de l'association
+ * @returns Le composant News
+ */
 const News = () => {
+  /**
+   * Tableau des articles d'actualités à afficher
+   */
   const articles = [
     {
       title: "Distribution de fournitures scolaires",

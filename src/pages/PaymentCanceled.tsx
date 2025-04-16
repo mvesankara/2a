@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { XCircle } from "lucide-react";
 
+/**
+ * Page affichée lorsqu'un paiement est annulé
+ * Permet à l'utilisateur de réessayer ou de retourner au tableau de bord
+ * @returns Le composant PaymentCanceled
+ */
 const PaymentCanceled = () => {
   const navigate = useNavigate();
 

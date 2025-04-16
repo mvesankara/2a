@@ -8,11 +8,19 @@ import { useAuth } from "@/hooks/useAuth";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import { useQuery } from "@tanstack/react-query";
 
+/**
+ * Page du tableau de bord utilisateur
+ * Affiche différentes sections selon le rôle de l'utilisateur (admin ou membre)
+ * @returns Le composant Dashboard
+ */
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
 
+  /**
+   * Gère la déconnexion de l'utilisateur
+   */
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -30,6 +38,10 @@ const Dashboard = () => {
     }
   };
 
+  /**
+   * Requête pour récupérer le profil de l'utilisateur connecté
+   * Utilisé pour déterminer si l'utilisateur est administrateur
+   */
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
     queryFn: async () => {

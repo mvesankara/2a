@@ -1,3 +1,4 @@
+
 import React from "react";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
@@ -5,7 +6,15 @@ import FeatureCard from "../components/FeatureCard";
 import Footer from "../components/Footer";
 import { Star, Shield, Heart } from "lucide-react";
 
+/**
+ * Page d'accueil du site
+ * Présente les valeurs principales de l'association
+ * @returns Le composant Index
+ */
 const Index = () => {
+  /**
+   * Tableau des valeurs et caractéristiques de l'association à afficher
+   */
   const features = [
     {
       title: "Excellence",

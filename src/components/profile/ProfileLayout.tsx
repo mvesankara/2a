@@ -3,11 +3,20 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Interface définissant les propriétés du composant ProfileLayout
+ */
 interface ProfileLayoutProps {
   children: React.ReactNode;
   loading?: boolean;
 }
 
+/**
+ * Layout pour les pages liées au profil utilisateur
+ * Fournit un cadre cohérent avec en-tête et système de chargement
+ * @param props - Les propriétés du composant
+ * @returns Le composant ProfileLayout
+ */
 export const ProfileLayout = ({ children, loading = false }: ProfileLayoutProps) => {
   const navigate = useNavigate();
 

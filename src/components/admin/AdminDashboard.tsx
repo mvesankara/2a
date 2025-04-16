@@ -8,9 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Tableau de bord administrateur
+ * Affiche les informations sur les membres et les événements
+ * @returns Le composant AdminDashboard
+ */
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
+  /**
+   * Requête pour récupérer tous les profils utilisateurs
+   */
   const { data: profiles, isLoading: profilesLoading } = useQuery({
     queryKey: ['profiles'],
     queryFn: async () => {
@@ -24,6 +32,9 @@ const AdminDashboard = () => {
     }
   });
 
+  /**
+   * Requête pour récupérer tous les événements
+   */
   const { data: events, isLoading: eventsLoading } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {

@@ -2,6 +2,11 @@
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { useProfileForm } from "@/hooks/useProfileForm";
 
+/**
+ * Page de complétion du profil utilisateur
+ * Utilise le hook useProfileForm pour gérer les données et les actions du formulaire
+ * @returns Le composant ProfileCompletion
+ */
 const ProfileCompletion = () => {
   const { formData, loading, handleChange, handleSubmit } = useProfileForm();
 
