@@ -52,6 +52,16 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
       console.log("Sign up response:", { data, error: signUpError });
 
       if (signUpError) throw signUpError;
+      
+      if (data?.user) {
+        await supabase.from("profiles").insert({
+        id: data.user.id,
+        email: data.user.email,
+        full_name: `${firstName} ${lastName}`,
+        role: "membre"
+      });
+    }   
+
 
       toast({
         title: "Inscription réussie",
