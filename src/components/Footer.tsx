@@ -35,9 +35,9 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact</h4>
             <p className="text-white/80">
-              Email: contact@2a.com
+              Email: acteursdelavenir@gmail.com
               <br />
-              Tel: +33 1 23 45 67 89
+              Tel: +33 0 00 00 00 00
             </p>
             <div className="mt-4 flex space-x-4">
               <a 
@@ -68,7 +68,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
-          <p>&copy; 2024 2A. All rights reserved.</p>
+          <p>&copy; 2025 2A. All rights reserved.</p>
         </div>
       </div>
     </footer>
