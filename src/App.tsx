@@ -1,4 +1,4 @@
-
+import MySpace from "@/pages/my-space";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
@@ -45,6 +45,10 @@ function App() {
             <Route 
               path="/dashboard" 
               element={<PrivateRoute element={<Dashboard />} />} 
+            />
+            <Route 
+              path="/my-space" 
+              element={<PrivateRoute element={<MySpace />} />} 
             />
             <Route 
               path="/profile" 

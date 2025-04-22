@@ -55,7 +55,18 @@ const Index = () => {
           </div>
         </div>
       </section>
-
+      <section className="py-16 bg-muted text-center">
+  <h2 className="text-3xl font-bold mb-4">Rejoignez-nous</h2>
+  <p className="mb-6">Envie de faire partie de l’aventure ?</p>
+  <a
+    href="https://docs.google.com/forms/d/1s8DmJv4uJrkr_ht4OY7w5UbBBFxy0z8TpA3Q7boYc8o"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition"
+  >
+    Remplir le formulaire
+  </a>
+</section>
       <Footer />
     </div>
   );
