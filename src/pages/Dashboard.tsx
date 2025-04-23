@@ -28,7 +28,7 @@ const Dashboard = () => {
         title: "Déconnexion réussie",
         description: "À bientôt !",
       });
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -163,6 +163,24 @@ const Dashboard = () => {
               Explorer
             </Button>
           </div>
+
+          <div className="bg-card rounded-lg shadow-lg p-6 mt-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold">Mon espace</h2>
+                <p className="text-sm text-muted-foreground">
+                  Gérer mes infos, projets et plus
+                </p>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => navigate("/my-space")}>
+              Accéder à mon espace
+            </Button>
+          </div>
+          
         </div>
       </main>
     </div>
