@@ -58,7 +58,7 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
         id: data.user.id,
         email: data.user.email,
         full_name: `${firstName} ${lastName}`,
-        role: "membre"
+        role: "adherent" // Changé de "membre" à "adherent" pour correspondre à l'enum
       });
     }   
 
