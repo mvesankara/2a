@@ -38,10 +38,18 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { Pencil, Trash2, Calendar, Users, ProjectorIcon, Filter } from "lucide-react"
+import { 
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import { Pencil, Trash2, Calendar, Users, ProjectorIcon, Filter, ArrowLeft, FileText } from "lucide-react"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import { ProfileLayout } from "@/components/profile/ProfileLayout"
+import ArticleForm from "@/components/articles/ArticleForm"
+import UserArticlesList from "@/components/articles/UserArticlesList"
 
 /**
  * Interface pour le type Projet
@@ -71,6 +79,7 @@ const MySpace = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [activeTab, setActiveTab] = useState("projets")
   const navigate = useNavigate()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
@@ -316,6 +325,16 @@ const MySpace = () => {
 
   return (
     <ProfileLayout loading={loading}>
+      <div className="flex justify-start mb-4">
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2"
+          onClick={() => navigate("/dashboard")}
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour au Dashboard
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 gap-8">
         {/* Section Profil */}
         <Card>
@@ -344,186 +363,234 @@ const MySpace = () => {
           </CardFooter>
         </Card>
 
-        {/* Formulaire de projet */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{isEditMode ? "Modifier le projet" : "Créer un projet"}</CardTitle>
-            <CardDescription>
-              {isEditMode ? "Modifiez les détails de votre projet" : "Ajoutez un nouveau projet à votre espace"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  Titre du projet
-                </label>
-                <Input
-                  id="title"
-                  placeholder="Titre du projet"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
+        {/* Tabs pour les projets et articles */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="projets" className="flex items-center gap-2">
+              <ProjectorIcon className="h-4 w-4" />
+              Mes Projets
+            </TabsTrigger>
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Mes Articles
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="projets">
+            {/* Section Projets */}
+            <div className="space-y-8">
+              {/* Formulaire de projet */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{isEditMode ? "Modifier le projet" : "Créer un projet"}</CardTitle>
+                  <CardDescription>
+                    {isEditMode ? "Modifiez les détails de votre projet" : "Ajoutez un nouveau projet à votre espace"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="title" className="text-sm font-medium">
+                        Titre du projet
+                      </label>
+                      <Input
+                        id="title"
+                        placeholder="Titre du projet"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <label htmlFor="description" className="text-sm font-medium">
-                  Description
-                </label>
-                <Textarea
-                  id="description"
-                  placeholder="Description du projet"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={4}
-                />
-              </div>
+                    <div className="space-y-2">
+                      <label htmlFor="description" className="text-sm font-medium">
+                        Description
+                      </label>
+                      <Textarea
+                        id="description"
+                        placeholder="Description du projet"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="status" className="text-sm font-medium">
-                    Statut
-                  </label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un statut" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Brouillon</SelectItem>
-                      <SelectItem value="in_progress">En cours</SelectItem>
-                      <SelectItem value="completed">Terminé</SelectItem>
-                      <SelectItem value="cancelled">Annulé</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label htmlFor="status" className="text-sm font-medium">
+                          Statut
+                        </label>
+                        <Select value={status} onValueChange={setStatus}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner un statut" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="draft">Brouillon</SelectItem>
+                            <SelectItem value="in_progress">En cours</SelectItem>
+                            <SelectItem value="completed">Terminé</SelectItem>
+                            <SelectItem value="cancelled">Annulé</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="deadline" className="text-sm font-medium">
-                    Date limite (optionnel)
-                  </label>
-                  <Input
-                    id="deadline"
-                    type="date"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
-                  />
-                </div>
-              </div>
+                      <div className="space-y-2">
+                        <label htmlFor="deadline" className="text-sm font-medium">
+                          Date limite (optionnel)
+                        </label>
+                        <Input
+                          id="deadline"
+                          type="date"
+                          value={deadline}
+                          onChange={(e) => setDeadline(e.target.value)}
+                        />
+                      </div>
+                    </div>
 
-              <div className="flex justify-end gap-2 pt-4">
-                {isEditMode && (
-                  <Button type="button" variant="outline" onClick={resetForm}>
-                    Annuler
-                  </Button>
-                )}
-                <Button type="submit">
-                  {isEditMode ? "Mettre à jour" : "Enregistrer"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                    <div className="flex justify-end gap-2 pt-4">
+                      {isEditMode && (
+                        <Button type="button" variant="outline" onClick={resetForm}>
+                          Annuler
+                        </Button>
+                      )}
+                      <Button type="submit">
+                        {isEditMode ? "Mettre à jour" : "Enregistrer"}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
 
-        {/* Liste des projets */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-xl">Mes Projets</CardTitle>
-              <CardDescription>Liste de tous vos projets</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={statusFilter} onValueChange={handleFilterChange}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filtrer par statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="draft">Brouillons</SelectItem>
-                  <SelectItem value="in_progress">En cours</SelectItem>
-                  <SelectItem value="completed">Terminés</SelectItem>
-                  <SelectItem value="cancelled">Annulés</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {projects.length === 0 ? (
-              <div className="text-center py-8">
-                <ProjectorIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-                <p className="mt-4 text-muted-foreground">
-                  {statusFilter === "all" 
-                    ? "Aucun projet pour l'instant."
-                    : `Aucun projet avec le statut "${translateStatus(statusFilter)}".`}
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Date de création</TableHead>
-                      <TableHead>Date limite</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {projects.map((project) => (
-                      <TableRow key={project.id}>
-                        <TableCell className="font-medium">{project.title}</TableCell>
-                        <TableCell>
-                          <span className={getStatusClass(project.status)}>
-                            {translateStatus(project.status)}
-                          </span>
-                        </TableCell>
-                        <TableCell>{formatDate(project.created_at)}</TableCell>
-                        <TableCell>{project.deadline ? formatDate(project.deadline) : "Non définie"}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEditProject(project)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Confirmer la suppression</DialogTitle>
-                                  <DialogDescription>
-                                    Êtes-vous sûr de vouloir supprimer le projet "{project.title}" ? 
-                                    Cette action est irréversible.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button 
-                                    variant="destructive" 
-                                    onClick={() => handleDeleteProject(project.id)}
+              {/* Liste des projets */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl">Mes Projets</CardTitle>
+                    <CardDescription>Liste de tous vos projets</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={statusFilter} onValueChange={handleFilterChange}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filtrer par statut" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tous les statuts</SelectItem>
+                        <SelectItem value="draft">Brouillons</SelectItem>
+                        <SelectItem value="in_progress">En cours</SelectItem>
+                        <SelectItem value="completed">Terminés</SelectItem>
+                        <SelectItem value="cancelled">Annulés</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {projects.length === 0 ? (
+                    <div className="text-center py-8">
+                      <ProjectorIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
+                      <p className="mt-4 text-muted-foreground">
+                        {statusFilter === "all" 
+                          ? "Aucun projet pour l'instant."
+                          : `Aucun projet avec le statut "${translateStatus(statusFilter)}".`}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Titre</TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead>Date de création</TableHead>
+                            <TableHead>Date limite</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {projects.map((project) => (
+                            <TableRow key={project.id}>
+                              <TableCell className="font-medium">{project.title}</TableCell>
+                              <TableCell>
+                                <span className={getStatusClass(project.status)}>
+                                  {translateStatus(project.status)}
+                                </span>
+                              </TableCell>
+                              <TableCell>{formatDate(project.created_at)}</TableCell>
+                              <TableCell>{project.deadline ? formatDate(project.deadline) : "Non définie"}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEditProject(project)}
                                   >
-                                    Supprimer
+                                    <Pencil className="h-4 w-4" />
                                   </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                      <DialogHeader>
+                                        <DialogTitle>Confirmer la suppression</DialogTitle>
+                                        <DialogDescription>
+                                          Êtes-vous sûr de vouloir supprimer le projet "{project.title}" ? 
+                                          Cette action est irréversible.
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      <DialogFooter>
+                                        <Button 
+                                          variant="destructive" 
+                                          onClick={() => handleDeleteProject(project.id)}
+                                        >
+                                          Supprimer
+                                        </Button>
+                                      </DialogFooter>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="articles">
+            {/* Section Articles */}
+            <div className="space-y-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Créer un article</CardTitle>
+                  <CardDescription>
+                    Rédigez un nouvel article pour partager avec la communauté
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ArticleForm onSuccess={() => setActiveTab("articles")} />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mes articles</CardTitle>
+                  <CardDescription>
+                    Liste de tous vos articles
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <UserArticlesList />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Bouton de déconnexion */}
         <div className="flex justify-end">

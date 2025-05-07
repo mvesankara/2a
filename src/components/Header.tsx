@@ -1,9 +1,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { LayoutDashboard } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <header className="border-b bg-background">
@@ -24,12 +27,24 @@ const Header = () => {
             >
               Actualités
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/login")}
-            >
-              Connexion
-            </Button>
+            
+            {user ? (
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/dashboard")}
+                className="flex items-center gap-2"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/login")}
+              >
+                Connexion
+              </Button>
+            )}
           </div>
         </nav>
       </div>

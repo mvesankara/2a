@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { User, Settings, LogOut, Bell, FileText, Users, Calendar } from "lucide-react";
+import { User, Settings, LogOut, Bell, FileText, Users, Calendar, Newspaper } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -66,6 +66,13 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">Mon Espace Personnel</h1>
           <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => navigate("/news")}
+            >
+              <Newspaper className="h-5 w-5" />
+            </Button>
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
@@ -127,6 +134,27 @@ const Dashboard = () => {
             </div>
             <Button variant="outline" className="w-full">
               Voir mes projets
+            </Button>
+          </div>
+
+          <div className="bg-card rounded-lg shadow-lg p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Newspaper className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold">Actualités</h2>
+                <p className="text-sm text-muted-foreground">
+                  Consultez et créez des actualités
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => navigate("/news")}
+            >
+              Voir les actualités
             </Button>
           </div>
 
