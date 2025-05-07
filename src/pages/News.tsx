@@ -32,27 +32,33 @@ interface Article {
 /**
  * Articles fictifs de secours au cas où la base de données ne contient pas d'articles
  */
-const fallbackArticles = [
+const fallbackArticles: Article[] = [
   {
     id: "1",
     title: "Lancement de notre première initiative sociale",
     summary: "Retour sur notre tout premier projet de terrain au sein de la communauté.",
+    content: "Contenu détaillé de l'article...",
     date: "2025-04-12",
     published: true,
+    user_id: "",
   },
   {
     id: "2",
     title: "Assemblée Générale 2025 : ce qu'il faut retenir",
     summary: "Décisions, perspectives et échanges clés de notre AG annuelle.",
+    content: "Contenu détaillé de l'article...",
     date: "2025-03-23",
     published: true,
+    user_id: "",
   },
   {
     id: "3",
     title: "Portrait : rencontre avec un membre engagé",
     summary: "Découvrez le parcours inspirant d'un bénévole actif.",
+    content: "Contenu détaillé de l'article...",
     date: "2025-02-15",
     published: true,
+    user_id: "",
   },
 ];
 
@@ -75,15 +81,26 @@ const News = () => {
         // Essayer de récupérer les articles depuis la base de données
         const { data, error } = await supabase
           .from("articles")
-          .select("*, profiles(full_name)")
+          .select("*")
           .eq("published", true)
           .order("date", { ascending: false });
         
         if (error) throw error;
         
+        // Process and type the data properly
+        const typedData: Article[] = data?.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          summary: item.summary,
+          content: item.content,
+          date: item.date,
+          published: item.published,
+          user_id: item.user_id,
+        })) || [];
+        
         // Si aucun article n'est trouvé, utiliser les articles fictifs
-        if (data && data.length > 0) {
-          setArticles(data);
+        if (typedData && typedData.length > 0) {
+          setArticles(typedData);
         } else {
           console.log("Aucun article trouvé, utilisation des articles fictifs");
           setArticles(fallbackArticles);
@@ -92,15 +109,15 @@ const News = () => {
         // Si un ID d'article est fourni, récupérer cet article spécifique
         if (id) {
           // D'abord vérifier dans les articles déjà récupérés
-          const foundArticle = data?.find(a => a.id === id) || fallbackArticles.find(a => a.id === id);
+          const foundArticle = typedData?.find(a => a.id === id) || fallbackArticles.find(a => a.id === id);
           
           if (foundArticle) {
             setArticle(foundArticle);
           } else {
             // Essayer de récupérer l'article spécifique
-            const { data: specificArticle, error: specificError } = await supabase
+            const { data: specificArticleData, error: specificError } = await supabase
               .from("articles")
-              .select("*, profiles(full_name)")
+              .select("*")
               .eq("id", id)
               .eq("published", true)
               .single();
@@ -108,8 +125,17 @@ const News = () => {
             if (specificError) {
               console.error("Erreur lors de la récupération de l'article:", specificError);
               navigate("/news");
-            } else if (specificArticle) {
-              setArticle(specificArticle);
+            } else if (specificArticleData) {
+              const typedArticle: Article = {
+                id: specificArticleData.id,
+                title: specificArticleData.title,
+                summary: specificArticleData.summary,
+                content: specificArticleData.content,
+                date: specificArticleData.date,
+                published: specificArticleData.published,
+                user_id: specificArticleData.user_id,
+              };
+              setArticle(typedArticle);
             }
           }
         }

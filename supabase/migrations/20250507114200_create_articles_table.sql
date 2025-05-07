@@ -58,3 +58,7 @@ CREATE TRIGGER update_articles_updated_at
 BEFORE UPDATE ON public.articles
 FOR EACH ROW
 EXECUTE FUNCTION update_articles_updated_at();
+
+-- Création d'une relation entre articles et profils
+ALTER TABLE public.articles ADD CONSTRAINT fk_articles_profiles
+    FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;

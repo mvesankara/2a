@@ -57,7 +57,18 @@ const UserArticlesList = () => {
       
       if (error) throw error;
       
-      setArticles(data || []);
+      // Ensure type safety of the data
+      const typeSafeData: Article[] = data?.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        summary: item.summary,
+        content: item.content,
+        date: item.date,
+        published: item.published,
+        user_id: item.user_id
+      })) || [];
+      
+      setArticles(typeSafeData);
     } catch (error: any) {
       console.error("Erreur lors du chargement des articles:", error);
       toast({

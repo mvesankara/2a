@@ -64,6 +64,7 @@ const ArticleForm = ({ onSuccess, initialData }: ArticleFormProps) => {
     
     try {
       if (isEditMode) {
+        // Update existing article
         const { error } = await supabase
           .from("articles")
           .update({
@@ -81,14 +82,17 @@ const ArticleForm = ({ onSuccess, initialData }: ArticleFormProps) => {
           description: "Votre article a été modifié avec succès",
         });
       } else {
-        const { error } = await supabase.from("articles").insert({
-          title,
-          summary,
-          content, 
-          user_id: user?.id,
-          published: false,
-          date: new Date().toISOString(),
-        });
+        // Create new article
+        const { error } = await supabase
+          .from("articles")
+          .insert({
+            title,
+            summary,
+            content, 
+            user_id: user?.id,
+            published: false,
+            date: new Date().toISOString(),
+          });
         
         if (error) throw error;
         

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Newspaper } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,7 +24,9 @@ const Header = () => {
             <Button
               variant="ghost"
               onClick={() => navigate("/news")}
+              className="flex items-center gap-2"
             >
+              <Newspaper className="h-4 w-4" />
               Actualités
             </Button>
             
