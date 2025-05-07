@@ -1,3 +1,4 @@
+
 import MySpace from "@/pages/my-space";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
@@ -10,6 +11,7 @@ import Payment from "@/pages/Payment";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
 import UserProfile from "@/pages/UserProfile";
+import News from "@/pages/News";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -42,6 +44,9 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/news" element={<News />} />
+            {/* Route for future individual article pages */}
+            <Route path="/news/:id" element={<News />} />
             <Route 
               path="/dashboard" 
               element={<PrivateRoute element={<Dashboard />} />} 
