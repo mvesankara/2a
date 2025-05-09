@@ -24,16 +24,7 @@ import { Pencil, Trash2, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import ArticleForm from "./ArticleForm";
-
-interface Article {
-  id: string;
-  title: string;
-  summary: string;
-  content: string;
-  date: string;
-  published: boolean;
-  user_id: string;
-}
+import { Article } from "@/types/articles";
 
 const UserArticlesList = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -49,26 +40,17 @@ const UserArticlesList = () => {
     
     try {
       setLoading(true);
+      
+      // Use a more direct approach to avoid type issues
       const { data, error } = await supabase
-        .from("articles")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("date", { ascending: false });
+        .from('articles')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false }) as { data: Article[] | null, error: any };
       
       if (error) throw error;
       
-      // Ensure type safety of the data
-      const typeSafeData: Article[] = data?.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        summary: item.summary,
-        content: item.content,
-        date: item.date,
-        published: item.published,
-        user_id: item.user_id
-      })) || [];
-      
-      setArticles(typeSafeData);
+      setArticles(data || []);
     } catch (error: any) {
       console.error("Erreur lors du chargement des articles:", error);
       toast({
@@ -90,9 +72,9 @@ const UserArticlesList = () => {
     
     try {
       const { error } = await supabase
-        .from("articles")
+        .from('articles')
         .delete()
-        .eq("id", articleToDelete);
+        .eq('id', articleToDelete);
       
       if (error) throw error;
       

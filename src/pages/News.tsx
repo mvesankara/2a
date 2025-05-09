@@ -15,19 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-
-interface Article {
-  id: string;
-  title: string;
-  summary: string;
-  content: string;
-  date: string;
-  published: boolean;
-  user_id: string;
-  profiles?: {
-    full_name: string;
-  }
-}
+import { Article } from "@/types/articles";
 
 /**
  * Articles fictifs de secours au cas où la base de données ne contient pas d'articles
@@ -78,64 +66,44 @@ const News = () => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        // Essayer de récupérer les articles depuis la base de données
+        // Use a more direct approach to avoid type issues
         const { data, error } = await supabase
-          .from("articles")
-          .select("*")
-          .eq("published", true)
-          .order("date", { ascending: false });
+          .from('articles')
+          .select('*')
+          .eq('published', true)
+          .order('date', { ascending: false }) as { data: Article[] | null, error: any };
         
         if (error) throw error;
         
-        // Process and type the data properly
-        const typedData: Article[] = data?.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          summary: item.summary,
-          content: item.content,
-          date: item.date,
-          published: item.published,
-          user_id: item.user_id,
-        })) || [];
-        
-        // Si aucun article n'est trouvé, utiliser les articles fictifs
-        if (typedData && typedData.length > 0) {
-          setArticles(typedData);
+        // If no articles are found, use the fallback articles
+        if (data && data.length > 0) {
+          setArticles(data);
         } else {
           console.log("Aucun article trouvé, utilisation des articles fictifs");
           setArticles(fallbackArticles);
         }
         
-        // Si un ID d'article est fourni, récupérer cet article spécifique
+        // If an ID is provided, fetch that specific article
         if (id) {
-          // D'abord vérifier dans les articles déjà récupérés
-          const foundArticle = typedData?.find(a => a.id === id) || fallbackArticles.find(a => a.id === id);
+          // First check in the already retrieved articles
+          const foundArticle = data?.find(a => a.id === id) || fallbackArticles.find(a => a.id === id);
           
           if (foundArticle) {
             setArticle(foundArticle);
           } else {
-            // Essayer de récupérer l'article spécifique
+            // Try to fetch the specific article
             const { data: specificArticleData, error: specificError } = await supabase
-              .from("articles")
-              .select("*")
-              .eq("id", id)
-              .eq("published", true)
-              .single();
+              .from('articles')
+              .select('*')
+              .eq('id', id)
+              .eq('published', true)
+              .single() as { data: Article | null, error: any };
             
             if (specificError) {
               console.error("Erreur lors de la récupération de l'article:", specificError);
               navigate("/news");
             } else if (specificArticleData) {
-              const typedArticle: Article = {
-                id: specificArticleData.id,
-                title: specificArticleData.title,
-                summary: specificArticleData.summary,
-                content: specificArticleData.content,
-                date: specificArticleData.date,
-                published: specificArticleData.published,
-                user_id: specificArticleData.user_id,
-              };
-              setArticle(typedArticle);
+              setArticle(specificArticleData);
             }
           }
         }
