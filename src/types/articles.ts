@@ -19,3 +19,6 @@ export interface ArticleFormData {
   summary: string;
   content: string;
 }
+
+export type ArticleInsert = Omit<Article, 'id' | 'created_at' | 'updated_at'>;
+export type ArticleUpdate = Partial<Omit<Article, 'id' | 'created_at' | 'user_id'>>;

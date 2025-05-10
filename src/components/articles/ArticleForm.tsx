@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Article, ArticleFormData } from "@/types/articles";
+import { Article, ArticleFormData, ArticleInsert, ArticleUpdate } from "@/types/articles";
 
 interface ArticleFormProps {
   onSuccess?: () => void;
@@ -66,14 +66,16 @@ const ArticleForm = ({ onSuccess, initialData }: ArticleFormProps) => {
     try {
       if (isEditMode) {
         // Update existing article
+        const updateData: ArticleUpdate = {
+          title,
+          summary,
+          content,
+          updated_at: new Date().toISOString(),
+        };
+        
         const { error } = await supabase
           .from('articles')
-          .update<Article>({
-            title,
-            summary,
-            content,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq("id", initialData.id);
           
         if (error) throw error;
@@ -84,16 +86,18 @@ const ArticleForm = ({ onSuccess, initialData }: ArticleFormProps) => {
         });
       } else {
         // Create new article
+        const insertData: ArticleInsert = {
+          title,
+          summary,
+          content, 
+          user_id: user?.id || '',
+          published: false,
+          date: new Date().toISOString(),
+        };
+        
         const { error } = await supabase
           .from('articles')
-          .insert<Article>({
-            title,
-            summary,
-            content, 
-            user_id: user?.id,
-            published: false,
-            date: new Date().toISOString(),
-          });
+          .insert(insertData);
         
         if (error) throw error;
         
