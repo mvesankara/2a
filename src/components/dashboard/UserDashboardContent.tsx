@@ -54,6 +54,7 @@ const UserDashboardContent = () => {
         description="Découvrez les membres"
         icon={<Users className="h-6 w-6 text-primary" />}
         buttonText="Explorer"
+        navigateTo="/community"
       />
 
       <DashboardCard

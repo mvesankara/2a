@@ -12,6 +12,7 @@ import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
 import UserProfile from "@/pages/UserProfile";
 import News from "@/pages/News";
+import Community from "@/pages/Community";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -58,6 +59,10 @@ function App() {
             <Route 
               path="/profile" 
               element={<PrivateRoute element={<UserProfile />} />} 
+            />
+            <Route 
+              path="/community" 
+              element={<PrivateRoute element={<Community />} />} 
             />
             <Route 
               path="/profile-completion" 
