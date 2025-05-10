@@ -2,9 +2,18 @@
 import { User, FileText, Newspaper, Calendar, Users } from "lucide-react";
 import DashboardCard from "./DashboardCard";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboardContent = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Fonction pour naviguer vers un onglet spécifique de My Space
+  const navigateToTab = (tab: string) => {
+    navigate('/my-space');
+    // On utilise le localStorage pour indiquer quel onglet doit être sélectionné
+    localStorage.setItem('myspace_active_tab', tab);
+  };
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -21,6 +30,7 @@ const UserDashboardContent = () => {
         description="Suivez vos projets en cours"
         icon={<FileText className="h-6 w-6 text-primary" />}
         buttonText="Voir mes projets"
+        onClick={() => navigateToTab("projets")}
       />
 
       <DashboardCard
@@ -36,6 +46,7 @@ const UserDashboardContent = () => {
         description="Calendrier des activités"
         icon={<Calendar className="h-6 w-6 text-primary" />}
         buttonText="Voir le calendrier"
+        onClick={() => navigateToTab("calendrier")}
       />
 
       <DashboardCard

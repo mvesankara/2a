@@ -6,12 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, ProjectorIcon, ArrowLeft, Loader2 } from "lucide-react";
+import { FileText, ProjectorIcon, ArrowLeft, Loader2, Calendar } from "lucide-react";
 import { ProfileLayout } from "@/components/profile/ProfileLayout";
 
 import ProfileCard from "@/components/my-space/ProfileCard";
 import ProjectsSection from "@/components/my-space/ProjectsSection";
 import ArticlesSection from "@/components/my-space/ArticlesSection";
+import CalendarSection from "@/components/my-space/CalendarSection";
 
 /**
  * Interface pour le type Projet
@@ -34,12 +35,18 @@ const MySpace = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [activeTab, setActiveTab] = useState("projets");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [projectsLoading, setProjectsLoading] = useState(true);
+  
+  // Récupération de l'onglet actif depuis localStorage ou par défaut "projets"
+  const [activeTab, setActiveTab] = useState(() => {
+    const savedTab = localStorage.getItem('myspace_active_tab');
+    return savedTab || "projets";
+  });
+  
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   /**
    * Effet pour vérifier l'authentification et charger les données
@@ -60,6 +67,11 @@ const MySpace = () => {
       fetchProjects();
     }
   }, [statusFilter, user]);
+  
+  // Sauvegarder l'onglet actif dans localStorage quand il change
+  useEffect(() => {
+    localStorage.setItem('myspace_active_tab', activeTab);
+  }, [activeTab]);
 
   /**
    * Récupère le profil de l'utilisateur connecté
@@ -162,12 +174,16 @@ const MySpace = () => {
         {/* Section Profil */}
         <ProfileCard profile={profile} loading={loading} />
 
-        {/* Tabs pour les projets et articles */}
+        {/* Tabs pour les projets, calendrier et articles */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="projets" className="flex items-center gap-2">
               <ProjectorIcon className="h-4 w-4" />
               Mes Projets
+            </TabsTrigger>
+            <TabsTrigger value="calendrier" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendrier
             </TabsTrigger>
             <TabsTrigger value="articles" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -182,6 +198,11 @@ const MySpace = () => {
               userId={user.id} 
               onProjectsChange={fetchProjects} 
             />
+          </TabsContent>
+          
+          <TabsContent value="calendrier">
+            {/* Section Calendrier */}
+            <CalendarSection userId={user.id} />
           </TabsContent>
           
           <TabsContent value="articles">
