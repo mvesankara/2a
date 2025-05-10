@@ -3,7 +3,7 @@ import { useState } from "react";
 import ProjectForm from "./ProjectForm";
 import ProjectList from "./ProjectList";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface Project {
@@ -35,6 +35,7 @@ const ProjectsSection = ({
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState("draft");
+  const [loading, setLoading] = useState(false);
 
   const handleEditProject = (project: Project) => {
     setTitle(project.title || "");
@@ -53,7 +54,9 @@ const ProjectsSection = ({
     // Reset form state
     resetForm();
     // Fetch updated projects
+    setLoading(true);
     onProjectsChange();
+    setTimeout(() => setLoading(false), 500);
   };
 
   const resetForm = () => {
@@ -68,7 +71,11 @@ const ProjectsSection = ({
 
   const handleFilterChange = (value: string) => {
     setStatusFilter(value);
-    setTimeout(() => onProjectsChange(), 100);
+    setLoading(true);
+    setTimeout(() => {
+      onProjectsChange();
+      setLoading(false);
+    }, 300);
   };
 
   return (
@@ -107,13 +114,20 @@ const ProjectsSection = ({
         </Card>
       )}
       
-      <ProjectList
-        projects={projects}
-        onEdit={handleEditProject}
-        onProjectsChange={onProjectsChange}
-        statusFilter={statusFilter}
-        onFilterChange={handleFilterChange}
-      />
+      {loading ? (
+        <div className="flex items-center justify-center p-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2">Chargement de vos projets...</span>
+        </div>
+      ) : (
+        <ProjectList
+          projects={projects}
+          onEdit={handleEditProject}
+          onProjectsChange={onProjectsChange}
+          statusFilter={statusFilter}
+          onFilterChange={handleFilterChange}
+        />
+      )}
     </div>
   );
 };

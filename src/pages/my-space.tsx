@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, ProjectorIcon, ArrowLeft } from "lucide-react";
+import { FileText, ProjectorIcon, ArrowLeft, Loader2 } from "lucide-react";
 import { ProfileLayout } from "@/components/profile/ProfileLayout";
 
 import ProfileCard from "@/components/my-space/ProfileCard";
@@ -38,6 +39,7 @@ const MySpace = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [projectsLoading, setProjectsLoading] = useState(true);
 
   /**
    * Effet pour vérifier l'authentification et charger les données
@@ -50,7 +52,14 @@ const MySpace = () => {
       fetchProfile();
       fetchProjects();
     }
-  }, [user, navigate, statusFilter]);
+  }, [user, navigate]);
+
+  // Effet séparé pour les projets avec filtre
+  useEffect(() => {
+    if (user) {
+      fetchProjects();
+    }
+  }, [statusFilter, user]);
 
   /**
    * Récupère le profil de l'utilisateur connecté
@@ -63,7 +72,14 @@ const MySpace = () => {
       .eq("id", user?.id)
       .single();
 
-    if (error) console.error("Erreur profil:", error);
+    if (error) {
+      console.error("Erreur profil:", error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de récupérer votre profil",
+        variant: "destructive",
+      });
+    }
     else setProfile(data);
     setLoading(false);
   };
@@ -76,10 +92,14 @@ const MySpace = () => {
     if (!user) return;
     
     try {
+      setProjectsLoading(true);
+      console.log("Récupération des projets pour utilisateur:", user.id);
+      console.log("Filtre de statut:", statusFilter);
+      
       let query = supabase
         .from("personal_projects")
         .select("*")
-        .eq("user_id", user?.id);
+        .eq("user_id", user.id);
         
       if (statusFilter !== "all") {
         query = query.eq("status", statusFilter);
@@ -94,11 +114,21 @@ const MySpace = () => {
           description: "Impossible de charger vos projets",
           variant: "destructive",
         });
+        setProjects([]);
       } else {
+        console.log("Projets récupérés:", data?.length || 0);
         setProjects(data || []);
       }
     } catch (error: any) {
-      console.error("Erreur projets:", error);
+      console.error("Exception récupération projets:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du chargement des projets",
+        variant: "destructive",
+      });
+      setProjects([]);
+    } finally {
+      setProjectsLoading(false);
     }
   };
 
