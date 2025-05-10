@@ -12,7 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Loader2, Save, X } from "lucide-react";
 
 interface ProjectFormProps {
   userId: string;
@@ -40,10 +48,12 @@ const ProjectForm = ({
   const [description, setDescription] = useState(initialData.description);
   const [deadline, setDeadline] = useState(initialData.deadline);
   const [status, setStatus] = useState(initialData.status);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     if (!title.trim()) {
       toast({
@@ -51,6 +61,7 @@ const ProjectForm = ({
         description: "Le titre du projet est requis",
         variant: "destructive",
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -92,10 +103,6 @@ const ProjectForm = ({
       }
 
       // Réinitialiser le formulaire et recharger les projets
-      setTitle("");
-      setDescription("");
-      setDeadline("");
-      setStatus("draft");
       onSuccess();
     } catch (error: any) {
       console.error("Erreur:", error);
@@ -104,6 +111,8 @@ const ProjectForm = ({
         description: error.message || "Une erreur est survenue",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -117,8 +126,8 @@ const ProjectForm = ({
             : "Ajoutez un nouveau projet à votre espace"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-medium">
               Titre du projet
@@ -138,7 +147,7 @@ const ProjectForm = ({
             </label>
             <Textarea
               id="description"
-              placeholder="Description du projet"
+              placeholder="Description détaillée du projet"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
@@ -175,19 +184,33 @@ const ProjectForm = ({
               />
             </div>
           </div>
+        </CardContent>
 
-          <div className="flex justify-end gap-2 pt-4">
-            {isEditMode && (
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Annuler
-              </Button>
+        <CardFooter className="flex justify-end gap-2 pt-4">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel}
+            className="flex items-center gap-1"
+            disabled={isSubmitting}
+          >
+            <X className="h-4 w-4" />
+            Annuler
+          </Button>
+          <Button 
+            type="submit"
+            disabled={isSubmitting}
+            className="flex items-center gap-1"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
             )}
-            <Button type="submit">
-              {isEditMode ? "Mettre à jour" : "Enregistrer"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
+            {isEditMode ? "Mettre à jour" : "Enregistrer"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 };

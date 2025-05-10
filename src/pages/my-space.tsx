@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
@@ -35,6 +34,7 @@ const MySpace = () => {
   const [profile, setProfile] = useState<any>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeTab, setActiveTab] = useState("projets");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ const MySpace = () => {
       fetchProfile();
       fetchProjects();
     }
-  }, [user, navigate]);
+  }, [user, navigate, statusFilter]);
 
   /**
    * Récupère le profil de l'utilisateur connecté
@@ -81,11 +81,8 @@ const MySpace = () => {
         .select("*")
         .eq("user_id", user?.id);
         
-      if (activeTab === "projets" && projects.length > 0) {
-        const statusFilter = projects[0].status;
-        if (statusFilter !== "all") {
-          query = query.eq("status", statusFilter);
-        }
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
       }
       
       const { data, error } = await query.order("created_at", { ascending: false });

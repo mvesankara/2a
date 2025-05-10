@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Pencil, Trash2, ProjectorIcon, Filter } from "lucide-react";
+import { Pencil, Trash2, ProjectorIcon, Filter, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import ProjectDetails from "./ProjectDetails";
 
 interface Project {
   id: string;
@@ -64,6 +65,8 @@ const ProjectList = ({
   onFilterChange,
 }: ProjectListProps) => {
   const { toast } = useToast();
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
   
   const handleDeleteProject = async (id: string) => {
     try {
@@ -119,107 +122,141 @@ const ProjectList = ({
     }
   };
 
+  const viewProjectDetails = (project: Project) => {
+    setSelectedProject(project);
+    setShowDetails(true);
+  };
+
+  const closeDetails = () => {
+    setShowDetails(false);
+    setSelectedProject(null);
+  };
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-xl">Mes Projets</CardTitle>
-          <CardDescription>Liste de tous vos projets</CardDescription>
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={onFilterChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrer par statut" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="draft">Brouillons</SelectItem>
-              <SelectItem value="in_progress">En cours</SelectItem>
-              <SelectItem value="completed">Terminés</SelectItem>
-              <SelectItem value="cancelled">Annulés</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {projects.length === 0 ? (
-          <div className="text-center py-8">
-            <ProjectorIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-            <p className="mt-4 text-muted-foreground">
-              {statusFilter === "all"
-                ? "Aucun projet pour l'instant."
-                : `Aucun projet avec le statut "${translateStatus(statusFilter)}".`}
-            </p>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-xl">Mes Projets</CardTitle>
+            <CardDescription>Liste de tous vos projets</CardDescription>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Titre</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Date de création</TableHead>
-                  <TableHead>Date limite</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {projects.map((project) => (
-                  <TableRow key={project.id}>
-                    <TableCell className="font-medium">{project.title}</TableCell>
-                    <TableCell>
-                      <span className={getStatusClass(project.status)}>
-                        {translateStatus(project.status)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{formatDate(project.created_at)}</TableCell>
-                    <TableCell>
-                      {project.deadline ? formatDate(project.deadline) : "Non définie"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onEdit(project)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Confirmer la suppression</DialogTitle>
-                              <DialogDescription>
-                                Êtes-vous sûr de vouloir supprimer le projet "{project.title}" ?
-                                Cette action est irréversible.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleDeleteProject(project.id)}
-                              >
-                                Supprimer
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </TableCell>
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Select value={statusFilter} onValueChange={onFilterChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrer par statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="draft">Brouillons</SelectItem>
+                <SelectItem value="in_progress">En cours</SelectItem>
+                <SelectItem value="completed">Terminés</SelectItem>
+                <SelectItem value="cancelled">Annulés</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {projects.length === 0 ? (
+            <div className="text-center py-8">
+              <ProjectorIcon className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
+              <p className="mt-4 text-muted-foreground">
+                {statusFilter === "all"
+                  ? "Aucun projet pour l'instant."
+                  : `Aucun projet avec le statut "${translateStatus(statusFilter)}".`}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Titre</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Date de création</TableHead>
+                    <TableHead>Date limite</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                </TableHeader>
+                <TableBody>
+                  {projects.map((project) => (
+                    <TableRow key={project.id}>
+                      <TableCell className="font-medium">{project.title}</TableCell>
+                      <TableCell>
+                        <span className={getStatusClass(project.status)}>
+                          {translateStatus(project.status)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{formatDate(project.created_at)}</TableCell>
+                      <TableCell>
+                        {project.deadline ? formatDate(project.deadline) : "Non définie"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => viewProjectDetails(project)}
+                            title="Voir les détails"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onEdit(project)}
+                            title="Modifier"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" title="Supprimer">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Confirmer la suppression</DialogTitle>
+                                <DialogDescription>
+                                  Êtes-vous sûr de vouloir supprimer le projet "{project.title}" ?
+                                  Cette action est irréversible.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleDeleteProject(project.id)}
+                                >
+                                  Supprimer
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Modal des détails du projet */}
+      {selectedProject && (
+        <ProjectDetails 
+          project={selectedProject} 
+          isOpen={showDetails} 
+          onClose={closeDetails} 
+          onEdit={() => {
+            closeDetails();
+            onEdit(selectedProject);
+          }}
+        />
+      )}
+    </>
   );
 };
 
