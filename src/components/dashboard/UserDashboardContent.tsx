@@ -56,10 +56,10 @@ const UserDashboardContent = () => {
 
       <DashboardCard
         title="Communauté"
-        description="Découvrez les membres et projets"
+        description="Découvrez notre écosystème"
         icon={<Users className="h-6 w-6 text-primary" />}
-        buttonText="Explorer les membres"
-        onClick={() => navigateToCommunityTab("membres")}
+        buttonText="Explorer la communauté"
+        navigateTo="/community"
       />
 
       <DashboardCard

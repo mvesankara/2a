@@ -1,5 +1,6 @@
 
 import { ReactNode } from "react";
+import { CommunityBreadcrumb } from "./CommunityBreadcrumb";
 
 /**
  * Props du composant CommunityLayout
@@ -7,6 +8,7 @@ import { ReactNode } from "react";
 interface CommunityLayoutProps {
   children: ReactNode;
   loading?: boolean;
+  showBreadcrumb?: boolean;
 }
 
 /**
@@ -14,11 +16,14 @@ interface CommunityLayoutProps {
  */
 export const CommunityLayout = ({ 
   children, 
-  loading = false 
+  loading = false,
+  showBreadcrumb = true
 }: CommunityLayoutProps) => {
   return (
     <div className="bg-background min-h-screen pb-12">
       <div className="container mx-auto px-4 py-8">
+        {showBreadcrumb && <CommunityBreadcrumb />}
+        
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="flex flex-col items-center gap-3">
