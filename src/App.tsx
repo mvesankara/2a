@@ -13,6 +13,7 @@ import PaymentCanceled from "@/pages/PaymentCanceled";
 import UserProfile from "@/pages/UserProfile";
 import News from "@/pages/News";
 import Community from "@/pages/Community";
+import Events from "@/pages/Events";
 import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -68,6 +69,10 @@ function App() {
             <Route 
               path="/community/members/:id" 
               element={<PrivateRoute element={<MemberDetail />} />} 
+            />
+            <Route 
+              path="/events" 
+              element={<PrivateRoute element={<Events />} />} 
             />
             <Route 
               path="/profile-completion" 

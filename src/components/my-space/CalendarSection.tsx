@@ -10,15 +10,17 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
-interface Project {
+interface Event {
   id: string;
-  title: string | null;
+  title: string;
   description: string | null;
-  status: string | null;
-  created_at: string;
-  deadline: string | null;
-  user_id: string | null;
+  start_date: string;
+  end_date: string | null;
+  location: string | null;
+  type: string | null;
+  created_by: string | null;
 }
 
 interface CalendarSectionProps {
@@ -27,49 +29,47 @@ interface CalendarSectionProps {
 
 const CalendarSection = ({ userId }: CalendarSectionProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [projectsWithDeadlines, setProjectsWithDeadlines] = useState<Project[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   
-  // Dates avec des projets (pour afficher des indicateurs dans le calendrier)
-  const [datesWithProjects, setDatesWithProjects] = useState<Date[]>([]);
+  // Dates avec des événements (pour afficher des indicateurs dans le calendrier)
+  const [datesWithEvents, setDatesWithEvents] = useState<Date[]>([]);
   
   useEffect(() => {
-    fetchProjects();
+    fetchEvents();
   }, [userId]);
 
-  const fetchProjects = async () => {
+  const fetchEvents = async () => {
     if (!userId) return;
     
     setLoading(true);
     
     try {
-      // Récupérer uniquement les projets avec des deadlines
+      // Récupérer tous les événements
       const { data, error } = await supabase
-        .from("personal_projects")
+        .from("events")
         .select("*")
-        .eq("user_id", userId)
-        .not("deadline", "is", null)
-        .order("deadline", { ascending: true });
+        .order("start_date", { ascending: true });
       
       if (error) {
         throw error;
       }
       
-      setProjectsWithDeadlines(data || []);
+      setEvents(data || []);
       
       // Extraire les dates uniques pour les indicateurs du calendrier
       const dates = data
-        .filter(project => project.deadline)
-        .map(project => new Date(project.deadline as string));
+        .filter(event => event.start_date)
+        .map(event => new Date(event.start_date));
       
-      setDatesWithProjects(dates);
+      setDatesWithEvents(dates);
       
     } catch (error: any) {
-      console.error("Erreur lors de la récupération des projets:", error);
+      console.error("Erreur lors de la récupération des événements:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les projets avec deadlines",
+        description: "Impossible de charger les événements",
         variant: "destructive",
       });
     } finally {
@@ -77,47 +77,60 @@ const CalendarSection = ({ userId }: CalendarSectionProps) => {
     }
   };
 
-  // Filtrer les projets pour la date sélectionnée
-  const projectsForSelectedDate = projectsWithDeadlines.filter(project => {
-    if (!project.deadline) return false;
+  // Filtrer les événements pour la date sélectionnée
+  const eventsForSelectedDate = events.filter(event => {
+    if (!event.start_date) return false;
     
-    const projectDate = new Date(project.deadline);
+    const eventDate = new Date(event.start_date);
     return (
-      projectDate.getDate() === selectedDate.getDate() &&
-      projectDate.getMonth() === selectedDate.getMonth() &&
-      projectDate.getFullYear() === selectedDate.getFullYear()
+      eventDate.getDate() === selectedDate.getDate() &&
+      eventDate.getMonth() === selectedDate.getMonth() &&
+      eventDate.getFullYear() === selectedDate.getFullYear()
     );
   });
 
-  // Fonction pour obtenir la couleur en fonction du statut
-  const getStatusColor = (status: string | null) => {
-    switch (status) {
-      case "completed": return "bg-green-500";
-      case "in_progress": return "bg-blue-500";
-      case "cancelled": return "bg-red-500";
-      case "draft": return "bg-gray-500";
-      default: return "bg-gray-300";
+  // Fonction pour obtenir la couleur en fonction du type d'événement
+  const getEventColor = (type: string | null) => {
+    switch (type) {
+      case "assemblee_generale": return "bg-primary";
+      case "reunion_extraordinaire": return "bg-destructive";
+      case "conseil_administration": return "bg-blue-500";
+      case "reunion_bureau": return "bg-amber-500";
+      case "reunion_commissions": return "bg-emerald-500";
+      case "formation": return "bg-purple-500";
+      default: return "bg-gray-500";
     }
   };
 
-  // Traduire les statuts en français
-  const translateStatus = (status: string | null) => {
-    switch (status) {
-      case "draft": return "Brouillon";
-      case "in_progress": return "En cours";
-      case "completed": return "Terminé";
-      case "cancelled": return "Annulé";
-      default: return status;
+  // Traduire les types d'événements en français
+  const translateEventType = (type: string | null) => {
+    switch (type) {
+      case "assemblee_generale": return "Assemblée générale";
+      case "reunion_extraordinaire": return "Réunion extraordinaire";
+      case "conseil_administration": return "Conseil d'administration";
+      case "reunion_bureau": return "Réunion de bureau";
+      case "reunion_commissions": return "Réunion de commissions";
+      case "formation": return "Formation";
+      default: return "Autre";
     }
   };
 
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Calendrier de mes projets</CardTitle>
-          <CardDescription>Visualisez vos échéances et planifiez votre temps</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Calendrier des événements</CardTitle>
+            <CardDescription>Visualisez les événements à venir</CardDescription>
+          </div>
+          <Button variant="outline" asChild>
+            <Link to="/events" className="flex items-center gap-1">
+              <CalendarIcon className="h-4 w-4" />
+              <span>Tous les événements</span>
+            </Link>
+          </Button>
         </CardHeader>
+        
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center p-8">
@@ -135,7 +148,7 @@ const CalendarSection = ({ userId }: CalendarSectionProps) => {
                   className="rounded-md border shadow p-3 pointer-events-auto"
                   locale={fr}
                   modifiers={{
-                    highlighted: datesWithProjects
+                    highlighted: datesWithEvents
                   }}
                   modifiersClassNames={{
                     highlighted: "bg-primary/20"
@@ -143,35 +156,44 @@ const CalendarSection = ({ userId }: CalendarSectionProps) => {
                 />
               </div>
               
-              {/* Liste des projets pour la date sélectionnée */}
+              {/* Liste des événements pour la date sélectionnée */}
               <div className="flex-1 border-l pl-4">
                 <div className="mb-4">
                   <h3 className="text-lg font-medium">
-                    Projets pour le {format(selectedDate, "d MMMM yyyy", { locale: fr })}
+                    Événements pour le {format(selectedDate, "d MMMM yyyy", { locale: fr })}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {projectsForSelectedDate.length === 0 
-                      ? "Aucun projet prévu pour cette date" 
-                      : `${projectsForSelectedDate.length} projet(s) prévu(s)`
+                    {eventsForSelectedDate.length === 0 
+                      ? "Aucun événement prévu pour cette date" 
+                      : `${eventsForSelectedDate.length} événement(s) prévu(s)`
                     }
                   </p>
                 </div>
                 
-                {projectsForSelectedDate.length > 0 ? (
+                {eventsForSelectedDate.length > 0 ? (
                   <div className="space-y-3">
-                    {projectsForSelectedDate.map(project => (
-                      <Card key={project.id} className="p-3">
+                    {eventsForSelectedDate.map(event => (
+                      <Card key={event.id} className="p-3">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="font-medium">{project.title}</h4>
-                            {project.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                                {project.description}
+                            <h4 className="font-medium">{event.title}</h4>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {format(new Date(event.start_date), 'HH:mm', { locale: fr })}
+                              {event.end_date && ` - ${format(new Date(event.end_date), 'HH:mm', { locale: fr })}`}
+                            </div>
+                            {event.location && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                📍 {event.location}
+                              </p>
+                            )}
+                            {event.description && (
+                              <p className="text-sm line-clamp-2 mt-1">
+                                {event.description}
                               </p>
                             )}
                           </div>
-                          <Badge className={`${getStatusColor(project.status)} text-white`}>
-                            {translateStatus(project.status)}
+                          <Badge className={`${getEventColor(event.type)} text-white`}>
+                            {translateEventType(event.type)}
                           </Badge>
                         </div>
                       </Card>
@@ -180,10 +202,15 @@ const CalendarSection = ({ userId }: CalendarSectionProps) => {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <CalendarIcon className="h-12 w-12 text-muted-foreground/30 mb-2" />
-                    <p className="text-muted-foreground">Aucun projet pour cette date</p>
+                    <p className="text-muted-foreground">Aucun événement pour cette date</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Les dates avec des projets sont surlignées dans le calendrier
+                      Les dates avec des événements sont surlignées dans le calendrier
                     </p>
+                    <Button variant="outline" className="mt-4" asChild>
+                      <Link to="/events">
+                        Voir tous les événements
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>

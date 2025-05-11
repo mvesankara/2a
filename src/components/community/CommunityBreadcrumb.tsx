@@ -13,18 +13,24 @@ export const CommunityBreadcrumb = () => {
   const path = location.pathname;
   
   let breadcrumbs: BreadcrumbItem[] = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Communauté", path: "/community" }
+    { label: "Dashboard", path: "/dashboard" }
   ];
   
-  // Add member detail breadcrumb if we're on that page
-  if (path.includes("/community/members/")) {
-    const memberId = path.split("/").pop();
-    breadcrumbs.push({ 
-      label: "Détails du membre", 
-      path: `/community/members/${memberId}`,
-      active: true 
-    });
+  // Ajouter les éléments de breadcrumb en fonction du chemin
+  if (path.includes("/community")) {
+    breadcrumbs.push({ label: "Communauté", path: "/community" });
+    
+    // Ajouter member detail breadcrumb si nous sommes sur cette page
+    if (path.includes("/community/members/")) {
+      const memberId = path.split("/").pop();
+      breadcrumbs.push({ 
+        label: "Détails du membre", 
+        path: `/community/members/${memberId}`,
+        active: true 
+      });
+    }
+  } else if (path.includes("/events")) {
+    breadcrumbs.push({ label: "Événements", path: "/events", active: true });
   }
   
   return (
