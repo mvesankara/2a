@@ -15,6 +15,11 @@ const UserDashboardContent = () => {
     localStorage.setItem('myspace_active_tab', tab);
   };
 
+  // Fonction pour naviguer vers un onglet spécifique de la communauté
+  const navigateToCommunityTab = (tab: string) => {
+    navigate(`/community${tab ? '#' + tab : ''}`);
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <DashboardCard
@@ -51,18 +56,18 @@ const UserDashboardContent = () => {
 
       <DashboardCard
         title="Communauté"
-        description="Découvrez les membres"
+        description="Découvrez les membres et projets"
         icon={<Users className="h-6 w-6 text-primary" />}
-        buttonText="Explorer"
-        navigateTo="/community"
+        buttonText="Explorer les membres"
+        onClick={() => navigateToCommunityTab("membres")}
       />
 
       <DashboardCard
-        title="Mon espace"
-        description="Gérer mes infos, projets et plus"
-        icon={<Users className="h-6 w-6 text-primary" />}
-        buttonText="Accéder à mon espace"
-        navigateTo="/my-space"
+        title="Projets communautaires"
+        description="Découvrez les projets publics"
+        icon={<FileText className="h-6 w-6 text-primary" />}
+        buttonText="Explorer les projets"
+        onClick={() => navigateToCommunityTab("projets")}
       />
     </div>
   );

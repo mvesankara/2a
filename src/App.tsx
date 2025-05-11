@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemberDetail } from "@/components/community/MemberDetail";
 
 /**
  * Création d'un nouveau client de requête pour React Query
@@ -63,6 +64,10 @@ function App() {
             <Route 
               path="/community" 
               element={<PrivateRoute element={<Community />} />} 
+            />
+            <Route 
+              path="/community/members/:id" 
+              element={<PrivateRoute element={<MemberDetail />} />} 
             />
             <Route 
               path="/profile-completion" 

@@ -5,9 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { User, MessageSquare } from "lucide-react";
+import { User, MessageSquare, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Member = {
   id: string;
@@ -26,7 +28,10 @@ const MembersList = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [skillFilter, setSkillFilter] = useState("");
+  const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMembers();
@@ -47,6 +52,14 @@ const MembersList = () => {
       if (error) throw error;
 
       setMembers(data || []);
+      
+      // Extract unique skills for filtering
+      const allSkills = data?.flatMap(member => member.skills || []) || [];
+      const uniqueSkills = [...new Set(allSkills)];
+      setAvailableSkills(uniqueSkills.sort());
+      
+      console.log("Fetched members:", data?.length);
+      
     } catch (error: any) {
       console.error("Erreur lors de la récupération des membres:", error);
       toast({
@@ -60,32 +73,60 @@ const MembersList = () => {
   };
 
   /**
-   * Filtre les membres en fonction du terme de recherche
+   * Navigue vers la page de détails du membre
+   */
+  const viewMemberDetails = (memberId: string) => {
+    navigate(`/community/members/${memberId}`);
+  };
+
+  /**
+   * Filtre les membres en fonction du terme de recherche et des filtres
    */
   const filteredMembers = members.filter((member) => {
     const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
     const location = `${member.city || ""} ${member.country || ""}`.toLowerCase();
     const skills = member.skills ? member.skills.join(" ").toLowerCase() : "";
     const searchLower = searchTerm.toLowerCase();
-
-    return (
+    
+    const matchesSearch = 
       fullName.includes(searchLower) ||
       location.includes(searchLower) ||
-      skills.includes(searchLower)
-    );
+      skills.includes(searchLower);
+      
+    const matchesSkill = 
+      !skillFilter || 
+      (member.skills && member.skills.some(skill => skill.toLowerCase() === skillFilter.toLowerCase()));
+    
+    return matchesSearch && matchesSkill;
   });
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <h2 className="text-2xl font-semibold">Membres</h2>
-        <Input
-          type="text"
-          placeholder="Rechercher par nom, compétence ou localisation..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <Input
+            type="text"
+            placeholder="Rechercher par nom ou localisation..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-sm"
+          />
+          <Select 
+            value={skillFilter} 
+            onValueChange={setSkillFilter}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Compétence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Toutes les compétences</SelectItem>
+              {availableSkills.map((skill) => (
+                <SelectItem key={skill} value={skill}>{skill}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {loading ? (
@@ -107,7 +148,11 @@ const MembersList = () => {
       ) : filteredMembers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMembers.map((member) => (
-            <Card key={member.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <Card 
+              key={member.id} 
+              className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => viewMemberDetails(member.id)}
+            >
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="bg-primary/10 rounded-full p-2">
@@ -117,7 +162,8 @@ const MembersList = () => {
                 </div>
 
                 {(member.city || member.country) && (
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground mb-2 flex items-center">
+                    <MapPin className="h-3 w-3 mr-1" />
                     {[member.city, member.country].filter(Boolean).join(", ")}
                   </p>
                 )}
@@ -139,7 +185,7 @@ const MembersList = () => {
 
                 <Button variant="ghost" size="sm" className="mt-1 flex items-center gap-1.5">
                   <MessageSquare className="h-4 w-4" />
-                  Contacter
+                  Voir le profil
                 </Button>
               </CardContent>
             </Card>
