@@ -24,10 +24,20 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("membres");
   
-  // Check if we should focus on projects tab from URL
+  // Check if we should focus on projects tab from URL or localStorage
   useEffect(() => {
+    // Vérifier d'abord le hash dans l'URL
     if (location.hash === '#projets') {
       setActiveTab("projets");
+    } 
+    // Ensuite vérifier le localStorage
+    else {
+      const savedTab = localStorage.getItem('community_active_tab');
+      if (savedTab === 'projets') {
+        setActiveTab("projets");
+        // Nettoyer après utilisation
+        localStorage.removeItem('community_active_tab');
+      }
     }
   }, [location.hash]);
 
@@ -115,7 +125,7 @@ const Community = () => {
           </Button>
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="membres">
           <TabsList className="mb-6">
             <TabsTrigger value="membres" className="flex items-center gap-1">
               <User className="h-4 w-4" /> Membres

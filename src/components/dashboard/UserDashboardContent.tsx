@@ -17,7 +17,15 @@ const UserDashboardContent = () => {
 
   // Fonction pour naviguer vers un onglet spécifique de la communauté
   const navigateToCommunityTab = (tab: string) => {
-    navigate(`/community${tab ? '#' + tab : ''}`);
+    navigate('/community');
+    
+    // Si un onglet spécifique est indiqué, on l'ajoute au hash après un délai
+    // pour s'assurer que la navigation est complète
+    if (tab) {
+      setTimeout(() => {
+        localStorage.setItem('community_active_tab', tab);
+      }, 100);
+    }
   };
 
   return (
@@ -51,7 +59,7 @@ const UserDashboardContent = () => {
         description="Calendrier des activités"
         icon={<Calendar className="h-6 w-6 text-primary" />}
         buttonText="Voir le calendrier"
-        onClick={() => navigateToTab("calendrier")}
+        navigateTo="/events"
       />
 
       <DashboardCard

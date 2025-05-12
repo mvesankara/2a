@@ -18,7 +18,11 @@ export const CommunityBreadcrumb = () => {
   
   // Ajouter les éléments de breadcrumb en fonction du chemin
   if (path.includes("/community")) {
-    breadcrumbs.push({ label: "Communauté", path: "/community" });
+    breadcrumbs.push({ 
+      label: "Communauté", 
+      path: "/community", 
+      active: path === "/community" 
+    });
     
     // Ajouter member detail breadcrumb si nous sommes sur cette page
     if (path.includes("/community/members/")) {
