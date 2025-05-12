@@ -19,12 +19,10 @@ const UserDashboardContent = () => {
   const navigateToCommunityTab = (tab: string) => {
     navigate('/community');
     
-    // Si un onglet spécifique est indiqué, on l'ajoute au hash après un délai
-    // pour s'assurer que la navigation est complète
+    // Si un onglet spécifique est indiqué, on l'ajoute au localStorage pour être récupéré
+    // dans la page Community.tsx
     if (tab) {
-      setTimeout(() => {
-        localStorage.setItem('community_active_tab', tab);
-      }, 100);
+      localStorage.setItem('community_active_tab', tab);
     }
   };
 
@@ -67,7 +65,7 @@ const UserDashboardContent = () => {
         description="Découvrez notre écosystème"
         icon={<Users className="h-6 w-6 text-primary" />}
         buttonText="Explorer la communauté"
-        navigateTo="/community"
+        onClick={() => navigateToCommunityTab("membres")}
       />
 
       <DashboardCard

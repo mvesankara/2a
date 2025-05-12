@@ -33,8 +33,8 @@ const Community = () => {
     // Ensuite vérifier le localStorage
     else {
       const savedTab = localStorage.getItem('community_active_tab');
-      if (savedTab === 'projets') {
-        setActiveTab("projets");
+      if (savedTab) {
+        setActiveTab(savedTab);
         // Nettoyer après utilisation
         localStorage.removeItem('community_active_tab');
       }
