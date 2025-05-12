@@ -18,7 +18,11 @@ import { Toaster } from "@/components/ui/toaster";
 import PrivateRoute from "@/components/PrivateRoute";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+<<<<<<< Updated upstream
 import { MemberDetail } from "@/components/community/MemberDetail";
+=======
+import NewArticle from "@/components/articles/NewArticle";
+>>>>>>> Stashed changes
 
 /**
  * Création d'un nouveau client de requête pour React Query
@@ -48,6 +52,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/news" element={<News />} />
+            <Route path="/articles/new" element={<PrivateRoute element={<NewArticle />} />} />
             {/* Route for future individual article pages */}
             <Route path="/news/:id" element={<News />} />
             <Route 

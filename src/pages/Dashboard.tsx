@@ -37,7 +37,7 @@ const Dashboard = () => {
   const isAdmin = profile?.role === 'administrateur';
 
   return (
-    <DashboardLayout title="Mon Espace Personnel">
+    <DashboardLayout title="Mon Tableau de Bord">
       {isAdmin && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-primary mb-4">Espace Administration</h2>
