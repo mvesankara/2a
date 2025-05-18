@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -74,7 +75,7 @@ export const CategoriesManagement = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      // Utilisez un cast pour contourner les vérifications de type
+      // Use a type assertion to bypass type checking
       const { data, error } = await (supabase
         .from('categories')
         .select('*')
@@ -126,7 +127,7 @@ export const CategoriesManagement = () => {
   const addCategory = async () => {
     try {
       setLoading(true);
-      // Utilisez un cast pour contourner les vérifications de type
+      // Use a type assertion to bypass type checking
       const { data, error } = await (supabase
         .from('categories')
         .insert([
@@ -184,7 +185,7 @@ export const CategoriesManagement = () => {
     
     try {
       setLoading(true);
-      // Utilisez un cast pour contourner les vérifications de type
+      // Use a type assertion to bypass type checking
       const { error } = await (supabase
         .from('categories')
         .update({
@@ -242,7 +243,7 @@ export const CategoriesManagement = () => {
     
     try {
       setLoading(true);
-      // Utilisez un cast pour contourner les vérifications de type
+      // Use a type assertion to bypass type checking
       const { error } = await (supabase
         .from('categories')
         .delete()

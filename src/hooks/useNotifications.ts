@@ -17,7 +17,7 @@ export const useNotifications = () => {
 
     try {
       setLoading(true);
-      // Utiliser any pour contourner le système de types
+      // Use a type assertion to bypass type checking
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -27,7 +27,7 @@ export const useNotifications = () => {
       if (error) throw error;
 
       if (data) {
-        // Cast des données au type correct
+        // Cast the data to the correct type
         const typedData = data as unknown as Notification[];
         setNotifications(typedData);
         setUnreadCount(typedData.filter(n => !n.is_read).length);
@@ -46,6 +46,7 @@ export const useNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
+      // Use a type assertion to bypass type checking
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
@@ -54,7 +55,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      // Mettre à jour l'état local
+      // Update local state
       setNotifications(prev => 
         prev.map(n => 
           n.id === notificationId ? { ...n, is_read: true } : n
@@ -74,6 +75,7 @@ export const useNotifications = () => {
 
   const markAllAsRead = async () => {
     try {
+      // Use a type assertion to bypass type checking
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
@@ -82,7 +84,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      // Mettre à jour l'état local
+      // Update local state
       setNotifications(prev => 
         prev.map(n => ({ ...n, is_read: true }))
       );
