@@ -17,7 +17,7 @@ export const useNotifications = () => {
 
     try {
       setLoading(true);
-      // Utilisez "from" avec un type générique pour éviter les erreurs TypeScript
+      // Utiliser any pour contourner le système de types
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -27,7 +27,7 @@ export const useNotifications = () => {
       if (error) throw error;
 
       if (data) {
-        // Cast the data to the correct type
+        // Cast des données au type correct
         const typedData = data as unknown as Notification[];
         setNotifications(typedData);
         setUnreadCount(typedData.filter(n => !n.is_read).length);
