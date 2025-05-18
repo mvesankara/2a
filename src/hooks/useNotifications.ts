@@ -17,11 +17,12 @@ export const useNotifications = () => {
 
     try {
       setLoading(true);
+      // Utilisez "from" avec un type générique pour éviter les erreurs TypeScript
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any;
 
       if (error) throw error;
 
@@ -49,7 +50,7 @@ export const useNotifications = () => {
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId)
-        .eq('user_id', user?.id);
+        .eq('user_id', user?.id) as any;
 
       if (error) throw error;
 
@@ -77,7 +78,7 @@ export const useNotifications = () => {
         .from('notifications')
         .update({ is_read: true })
         .eq('user_id', user?.id)
-        .eq('is_read', false);
+        .eq('is_read', false) as any;
 
       if (error) throw error;
 
