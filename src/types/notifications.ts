@@ -8,4 +8,5 @@ export interface Notification {
   related_entity_type?: string;
   is_read: boolean;
   created_at: string;
+  user_id: string;
 }

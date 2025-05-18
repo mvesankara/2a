@@ -17,17 +17,22 @@ export const useNotifications = () => {
 
     try {
       setLoading(true);
+      // Utiliser la fonction query générique pour éviter les erreurs de type
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as unknown as { 
+          data: Notification[] | null; 
+          error: any;
+        };
 
       if (error) throw error;
 
-      const typedData = data as Notification[];
-      setNotifications(typedData);
-      setUnreadCount(typedData.filter(n => !n.is_read).length);
+      if (data) {
+        setNotifications(data);
+        setUnreadCount(data.filter(n => !n.is_read).length);
+      }
     } catch (error) {
       console.error('Erreur en récupérant les notifications:', error);
       toast({
@@ -46,7 +51,9 @@ export const useNotifications = () => {
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId)
-        .eq('user_id', user?.id);
+        .eq('user_id', user?.id) as unknown as { 
+          error: any;
+        };
 
       if (error) throw error;
 
@@ -74,7 +81,9 @@ export const useNotifications = () => {
         .from('notifications')
         .update({ is_read: true })
         .eq('user_id', user?.id)
-        .eq('is_read', false);
+        .eq('is_read', false) as unknown as {
+          error: any;
+        };
 
       if (error) throw error;
 

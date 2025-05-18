@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -60,16 +59,21 @@ export const CategoriesManagement = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
+      // Utiliser la fonction query générique pour éviter les erreurs de type
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name');
+        .order('name') as unknown as {
+          data: Category[] | null;
+          error: any;
+        };
 
       if (error) throw error;
 
-      const typedData = data as Category[];
-      setCategories(typedData);
-      filterCategoriesByType(categoryType, typedData);
+      if (data) {
+        setCategories(data);
+        filterCategoriesByType(categoryType, data);
+      }
     } catch (error) {
       console.error("Erreur lors de la récupération des catégories:", error);
       toast({
@@ -118,7 +122,10 @@ export const CategoriesManagement = () => {
             color: formData.color,
           },
         ])
-        .select();
+        .select() as unknown as {
+          data: Category[] | null;
+          error: any;
+        };
 
       if (error) throw error;
 
@@ -168,7 +175,9 @@ export const CategoriesManagement = () => {
           color: formData.color,
           type: formData.type
         })
-        .eq('id', currentCategory.id);
+        .eq('id', currentCategory.id) as unknown as {
+          error: any;
+        };
 
       if (error) throw error;
 
@@ -195,7 +204,9 @@ export const CategoriesManagement = () => {
       const { error } = await supabase
         .from('categories')
         .delete()
-        .eq('id', categoryId);
+        .eq('id', categoryId) as unknown as {
+          error: any;
+        };
 
       if (error) throw error;
 
