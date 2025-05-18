@@ -1,36 +1,20 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { FileText, Calendar, ArrowLeft, LayoutDashboard } from "lucide-react";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import { FileText, Calendar, ArrowLeft, Plus } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Article } from "@/types/articles";
-import React, { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import Header from "../components/Header"
-import Footer from "../components/Footer"
-import { FileText, Calendar, ArrowLeft, LayoutDashboard, Plus } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { supabase } from "@/integrations/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
-import { format } from "date-fns"
-import { fr } from "date-fns/locale"
 
 interface Article {
   id: string;
@@ -122,10 +106,6 @@ const News = () => {
               setArticle(specificArticleData);
             }
           }
-
-        if (id) {
-          const found = typedData.find(a => a.id === id) || fallbackArticles.find(a => a.id === id)
-          setArticle(found || null)
         }
       } catch (error) {
         console.error("Erreur chargement articles:", error)
@@ -136,7 +116,7 @@ const News = () => {
     }
 
     fetchArticles()
-  }, [id])
+  }, [id, navigate])
 
   const formatDate = (dateString: string) =>
     format(new Date(dateString), "d MMMM yyyy", { locale: fr })
@@ -207,7 +187,7 @@ const News = () => {
                           onClick={() => navigate(`/news/${article.id}`)}
                         >
                           <FileText className="mr-2 h-4 w-4" />
-                          Lire l’article
+                          Lire l'article
                         </Button>
                       </div>
                     </Card>
