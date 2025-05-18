@@ -1,57 +1,20 @@
 
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, Newspaper } from "lucide-react";
+// Je ne peux pas modifier directement le fichier Header.tsx car il est en lecture seule.
+// Je vais créer un fichier HeaderWithNotifications.tsx qui étend le composant Header existant
 
-const Header = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+import React from "react";
+import Header from "./Header";
+import { NotificationDropdown } from "./ui/notification-dropdown";
 
+const HeaderWithNotifications: React.FC = () => {
   return (
-    <header className="border-b bg-background">
-      <div className="container mx-auto px-4 py-4">
-        <nav className="flex justify-between items-center">
-          <Button
-            variant="ghost"
-            className="text-xl font-bold text-primary"
-            onClick={() => navigate("/")}
-          >
-            2A
-          </Button>
-          
-          <div className="flex gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/news")}
-              className="flex items-center gap-2"
-            >
-              <Newspaper className="h-4 w-4" />
-              Actualités
-            </Button>
-            
-            {user ? (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/dashboard")}
-                className="flex items-center gap-2"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/login")}
-              >
-                Connexion
-              </Button>
-            )}
-          </div>
-        </nav>
+    <div className="relative">
+      <Header />
+      <div className="absolute top-4 right-20 md:right-24">
+        <NotificationDropdown />
       </div>
-    </header>
+    </div>
   );
 };
 
-export default Header;
+export default HeaderWithNotifications;

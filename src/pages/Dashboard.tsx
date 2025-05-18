@@ -2,9 +2,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import AdminDashboard from "@/components/admin/AdminDashboard";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import UserDashboardContent from "@/components/dashboard/UserDashboardContent";
+import AdminDashboardContent from "@/components/dashboard/AdminDashboardContent";
 
 /**
  * Page du tableau de bord utilisateur
@@ -38,14 +38,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout title="Mon Tableau de Bord">
-      {isAdmin && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-primary mb-4">Espace Administration</h2>
-          <AdminDashboard />
-        </div>
-      )}
-      
-      <UserDashboardContent />
+      {isAdmin ? <AdminDashboardContent /> : <UserDashboardContent />}
     </DashboardLayout>
   );
 };
