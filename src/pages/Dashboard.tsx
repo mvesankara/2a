@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { User, Settings, LogOut, Bell, FileText, Users, Calendar } from "lucide-react";
+import { AuthError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,7 +22,7 @@ const Dashboard = () => {
         description: "À bientôt !",
       });
       navigate("/login", { replace: true });
-    } catch (error: any) {
+    } catch (error: AuthError) {
       toast({
         title: "Erreur",
         description: "Un problème est survenu lors de la déconnexion",
@@ -46,6 +47,12 @@ const Dashboard = () => {
     enabled: !!user?.id
   });
 
+  // SECURITY NOTE: The 'isAdmin' constant is used for client-side UI rendering logic only.
+  // Any actual administrative operations or modifications to sensitive data performed
+  // by an admin (e.g., within AdminDashboard or related components/API calls)
+  // MUST be rigorously protected by server-side Row Level Security (RLS) policies
+  // in Supabase that verify the user's 'administrateur' role from the authenticated session.
+  // Client-side checks are insufficient for protecting sensitive operations.
   const isAdmin = profile?.role === 'administrateur';
 
   return (
@@ -113,7 +120,7 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" disabled>
               Voir mes projets
             </Button>
           </div>
@@ -130,7 +137,7 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" disabled>
               Voir le calendrier
             </Button>
           </div>
@@ -147,7 +154,7 @@ const Dashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" disabled>
               Explorer
             </Button>
           </div>

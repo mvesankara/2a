@@ -11,10 +11,6 @@ interface PrivateRouteProps {
 const PrivateRoute = ({ element }: PrivateRouteProps) => {
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    console.log("PrivateRoute - User state:", { user, loading });
-  }, [user, loading]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,11 +21,9 @@ const PrivateRoute = ({ element }: PrivateRouteProps) => {
   }
 
   if (!user) {
-    console.log("PrivateRoute - User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
-  console.log("PrivateRoute - User authenticated, rendering protected content");
   return element;
 };
 

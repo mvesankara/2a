@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FunctionsError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,7 +28,7 @@ export const usePayment = () => {
       setStatus(data.paymentStatus);
       setHasCheckedStatus(true);
       return data.paymentStatus;
-    } catch (error: any) {
+    } catch (error: FunctionsError) {
       console.error("Erreur lors de la vérification du statut de paiement:", error);
       toast({
         title: "Erreur",
@@ -58,7 +59,7 @@ export const usePayment = () => {
       } else {
         throw new Error("URL de paiement non reçue");
       }
-    } catch (error: any) {
+    } catch (error: FunctionsError) {
       console.error("Erreur lors de la création de la session de paiement:", error);
       toast({
         title: "Erreur",

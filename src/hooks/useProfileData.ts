@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { PostgrestError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,6 +46,9 @@ export const useProfileData = () => {
     enabled: !!user?.id
   });
 
+  // TODO: The current skills handling (join with ", " for display, split by "," on submit)
+  // means individual skills cannot contain commas. This could be improved with a tag-based input UI
+  // or by using a different, less common delimiter if plain text input is maintained.
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -97,7 +101,7 @@ export const useProfileData = () => {
         title: "Profil mis à jour",
         description: "Votre profil a été modifié avec succès",
       });
-    } catch (error: any) {
+    } catch (error: PostgrestError) {
       toast({
         title: "Erreur",
         description:

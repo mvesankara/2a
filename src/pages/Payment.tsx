@@ -14,7 +14,7 @@ const Payment = () => {
     if (user && !hasCheckedStatus) {
       checkPaymentStatus();
     }
-  }, [user, hasCheckedStatus]);
+  }, [user, hasCheckedStatus, checkPaymentStatus]);
 
   const handlePayment = async (type: "one_time" | "subscription") => {
     await createPaymentSession(type);

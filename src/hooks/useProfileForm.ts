@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { PostgrestError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,13 +34,13 @@ export const useProfileForm = () => {
   useEffect(() => {
     const loadProfile = async () => {
       if (!user) {
-        console.log("No user found, redirecting to login");
+        // console.log("No user found, redirecting to login");
         navigate("/login");
         return;
       }
 
       try {
-        console.log("Fetching profile data for user:", user.id);
+        // console.log("Fetching profile data for user:", user.id);
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("*")
@@ -47,11 +48,11 @@ export const useProfileForm = () => {
           .single();
 
         if (error) {
-          console.error("Error fetching profile:", error);
+          // console.error("Error fetching profile:", error);
           throw error;
         }
 
-        console.log("Profile data received:", profile);
+        // console.log("Profile data received:", profile);
         if (profile) {
           setFormData({
             firstName: profile.first_name || "",
@@ -63,8 +64,8 @@ export const useProfileForm = () => {
             skills: Array.isArray(profile.skills) ? profile.skills.join(", ") : "",
           });
         }
-      } catch (error) {
-        console.error("Error in loadProfile:", error);
+      } catch (error: PostgrestError) {
+        // console.error("Error in loadProfile:", error);
         toast({
           title: "Erreur",
           description: "Impossible de charger votre profil",
@@ -86,7 +87,7 @@ export const useProfileForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      console.log("No user found during submission");
+      // console.log("No user found during submission");
       toast({
         title: "Erreur",
         description: "Vous devez être connecté pour compléter votre profil",
@@ -97,7 +98,7 @@ export const useProfileForm = () => {
 
     setLoading(true);
     try {
-      console.log("Updating profile for user:", user.id);
+      // console.log("Updating profile for user:", user.id);
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -113,19 +114,19 @@ export const useProfileForm = () => {
         .eq("id", user.id);
 
       if (error) {
-        console.error("Error updating profile:", error);
+        // console.error("Error updating profile:", error);
         throw error;
       }
 
-      console.log("Profile updated successfully");
+      // console.log("Profile updated successfully");
       toast({
         title: "Profil mis à jour",
         description: "Votre profil a été complété avec succès",
       });
 
       navigate("/dashboard");
-    } catch (error: any) {
-      console.error("Error in handleSubmit:", error);
+    } catch (error: PostgrestError) {
+      // console.error("Error in handleSubmit:", error);
       toast({
         title: "Erreur",
         description:

@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { AuthError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -23,8 +24,6 @@ const ResetPasswordForm = ({ onCancel }: ResetPasswordFormProps) => {
       const origin = window.location.origin;
       const resetRedirectTo = `${origin}/reset-password`;
       
-      console.log("Sending reset password email with redirect to:", resetRedirectTo);
-      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: resetRedirectTo,
       });
@@ -36,7 +35,7 @@ const ResetPasswordForm = ({ onCancel }: ResetPasswordFormProps) => {
         description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
       });
       onCancel();
-    } catch (error: any) {
+    } catch (error: AuthError) {
       console.error("Reset password error:", error);
       toast({
         title: "Erreur",

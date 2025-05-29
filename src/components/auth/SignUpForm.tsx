@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { AuthError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserPlus } from "lucide-react";
@@ -21,7 +22,6 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Attempting to sign up...");
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -36,8 +36,6 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
         },
       });
 
-      console.log("Sign up response:", { data, error: signUpError });
-
       if (signUpError) throw signUpError;
 
       toast({
@@ -45,7 +43,7 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
         description: "Bienvenue ! Vous pouvez maintenant vous connecter.",
       });
       onToggleMode();
-    } catch (error: any) {
+    } catch (error: AuthError) {
       console.error("Auth error:", error);
       
       // Messages d'erreur plus spécifiques

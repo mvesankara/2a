@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { AuthError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
@@ -30,7 +31,7 @@ const ResetPassword = () => {
         }
         
         console.log("Reset password session check:", data);
-      } catch (error: any) {
+      } catch (error: AuthError) {
         console.error("Reset verification error:", error);
         toast({
           title: "Lien invalide",
@@ -86,7 +87,7 @@ const ResetPassword = () => {
         navigate("/login", { replace: true });
       }, 2000);
       
-    } catch (error: any) {
+    } catch (error: AuthError) {
       console.error("Password update error:", error);
       toast({
         title: "Erreur",

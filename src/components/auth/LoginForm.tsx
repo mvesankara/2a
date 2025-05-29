@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { AuthError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +23,6 @@ const LoginForm = ({ onToggleMode, onToggleReset }: LoginFormProps) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Attempting to sign in...");
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -30,22 +30,14 @@ const LoginForm = ({ onToggleMode, onToggleReset }: LoginFormProps) => {
         password,
       });
 
-      console.log("Sign in response:", { data, error: signInError });
-
       if (signInError) throw signInError;
 
-      console.log("Sign in successful, redirecting to dashboard");
-      
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté",
       });
-      
-      // Utilisez setTimeout pour s'assurer que la redirection fonctionne après que l'état soit mis à jour
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
-    } catch (error: any) {
+      navigate("/dashboard", { replace: true });
+    } catch (error: AuthError) {
       console.error("Auth error:", error);
       
       // Messages d'erreur plus spécifiques
