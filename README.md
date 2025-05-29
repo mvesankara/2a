@@ -36,6 +36,41 @@ npm i
 npm run dev
 ```
 
+## Local Environment Setup
+
+To run this project effectively locally, especially for features involving Supabase (like authentication, database interactions), you need to configure your local Supabase environment variables.
+
+### Setting up Supabase Locally
+
+The project is configured to use Vite environment variables for Supabase connectivity. These are:
+- `VITE_SUPABASE_URL`: Your unique Supabase project URL.
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase project's anonymous public key.
+
+**Steps:**
+
+1.  **Create a `.env` file:**
+    In the root directory of this project, create a new file named `.env`.
+
+2.  **Add Supabase credentials to `.env`:**
+    Open the `.env` file and add the following lines, replacing the placeholder values with your actual Supabase project credentials:
+
+    ```env
+    VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
+    VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+    ```
+
+3.  **Find your Supabase credentials:**
+    You can find "YOUR_SUPABASE_URL" and "YOUR_SUPABASE_ANON_KEY" in your Supabase project dashboard:
+    *   Go to your project on [Supabase](https://supabase.com/).
+    *   Navigate to **Project Settings** (the gear icon in the left sidebar).
+    *   Click on **API**.
+    *   Under "Project API keys", you'll find the "URL" (this is your `VITE_SUPABASE_URL`) and the "anon" "public" key (this is your `VITE_SUPABASE_ANON_KEY`).
+
+**Important Notes:**
+
+*   The Supabase client configuration file (`src/integrations/supabase/client.ts`) has been modified to prioritize these environment variables. If they are not found (e.g., the `.env` file is missing or not populated), the application will fall back to using hardcoded values that might be present in the `client.ts` file. You will see a `console.warn` message in your browser's developer console if this fallback occurs. Using a `.env` file is strongly recommended for local development to ensure you are connecting to your intended Supabase backend.
+*   The `.env` file should be automatically included in your project's `.gitignore` file (as is standard for Vite projects) to prevent your secret keys from being committed to version control. Always ensure your `.env` file is not tracked by Git.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
