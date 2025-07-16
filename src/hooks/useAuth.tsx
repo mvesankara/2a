@@ -17,23 +17,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Établir d'abord l'écouteur d'événements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, session);
-      setUser(session?.user ?? null);
-      setSession(session);
-      setLoading(false);
-    });
+    const fetchSessionAndListen = async () => {
+      try {
+        // First, get the current session
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-    // Ensuite vérifier la session actuelle
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Current session:", session);
-      setUser(session?.user ?? null);
-      setSession(session);
-      setLoading(false);
-    });
+        if (error) {
+          throw error;
+        }
 
-    return () => subscription.unsubscribe();
+        console.log("Current session:", session);
+        setUser(session?.user ?? null);
+        setSession(session);
+      } catch (error) {
+        console.error("Error fetching initial session:", error);
+        // Set user and session to null if there's an error
+        setUser(null);
+        setSession(null);
+      } finally {
+        // Set loading to false only after the initial check is complete
+        setLoading(false);
+      }
+
+      // Then, set up the auth state change listener
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        console.log("Auth state changed:", _event, session);
+        setUser(session?.user ?? null);
+        setSession(session);
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
+
+    const unsubscribePromise = fetchSessionAndListen();
+
+    return () => {
+      unsubscribePromise.then(unsubscribe => unsubscribe && unsubscribe());
+    };
   }, []);
 
   return (
