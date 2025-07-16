@@ -17,44 +17,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSessionAndListen = async () => {
-      try {
-        // First, get the current session
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        if (error) {
-          throw error;
-        }
-
-        console.log("Current session:", session);
-        setUser(session?.user ?? null);
+    setLoading(true);
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
         setSession(session);
-      } catch (error) {
+        setUser(session?.user ?? null);
+      })
+      .catch((error) => {
         console.error("Error fetching initial session:", error);
-        // Set user and session to null if there's an error
         setUser(null);
         setSession(null);
-      } finally {
-        // Set loading to false only after the initial check is complete
+      })
+      .finally(() => {
         setLoading(false);
-      }
-
-      // Then, set up the auth state change listener
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        console.log("Auth state changed:", _event, session);
-        setUser(session?.user ?? null);
-        setSession(session);
       });
+  }, []);
 
-      return () => {
-        subscription.unsubscribe();
-      };
-    };
-
-    const unsubscribePromise = fetchSessionAndListen();
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
 
     return () => {
-      unsubscribePromise.then(unsubscribe => unsubscribe && unsubscribe());
+      subscription.unsubscribe();
     };
   }, []);
 
