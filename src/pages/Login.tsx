@@ -16,17 +16,17 @@ const Login = () => {
   const [isResetMode, setIsResetMode] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   /**
    * Effect qui redirige vers le tableau de bord si l'utilisateur est déjà connecté
    */
   useEffect(() => {
-    if (user) {
+    if (user && !loading) {
       console.log("User already logged in, redirecting to dashboard");
       navigate("/my-space", { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   /**
    * Détermine le titre à afficher selon le mode actuel
