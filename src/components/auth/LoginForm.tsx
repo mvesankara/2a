@@ -54,10 +54,7 @@ const LoginForm = ({ onToggleMode, onToggleReset }: LoginFormProps) => {
         description: "Vous êtes maintenant connecté",
       });
       
-      // Utilisez setTimeout pour s'assurer que la redirection fonctionne après que l'état soit mis à jour
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      // The redirection is now handled by the Login page component
     } catch (error: any) {
       console.error("Auth error:", error);
       
