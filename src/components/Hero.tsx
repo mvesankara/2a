@@ -7,7 +7,7 @@ const Hero = () => {
         <div className="text-center animate-fade-in">
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/bbaa130c-f3b7-4490-9b40-8734722a20ef.png"
+              src="/uploads/bbaa130c-f3b7-4490-9b40-8734722a20ef.png"
               alt="2A Logo"
               className="w-48 h-48 mx-auto object-contain"
             />
