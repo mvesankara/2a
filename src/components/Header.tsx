@@ -8,7 +8,7 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between p-4 border-b">
       <Link to="/" className="text-xl font-bold">
-        Lovable
+        Project
       </Link>
       <div className="flex items-center gap-4">
         {user ? (
