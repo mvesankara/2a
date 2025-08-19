@@ -16,7 +16,7 @@ const Header = () => {
             <Link to="/my-space">
               <Button variant="ghost">My Space</Button>
             </Link>
-            <Button onClick={signOut}>Logout</Button>
+            <Button onClick={() => signOut()}>Logout</Button>
           </>
         ) : (
           <Link to="/login">
