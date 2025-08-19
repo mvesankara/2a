@@ -1,69 +1,66 @@
-# Welcome to your Lovable project
+# Simplified React Project
 
-## Project info
+This is a simplified version of a React project, bootstrapped with Vite and using TypeScript, Tailwind CSS, and Supabase for authentication.
 
-**URL**: https://lovable.dev/projects/b63d3f66-c9e4-4f3c-8ec3-9f2713285b95
+## Getting Started
 
-## How can I edit this code?
+To get a local copy up and running, follow these simple steps.
 
-There are several ways of editing your application.
+### Prerequisites
 
-**Use Lovable**
+You need to have Node.js and npm installed on your machine. You can use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) to manage your Node.js versions.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b63d3f66-c9e4-4f3c-8ec3-9f2713285b95) and start prompting.
+### Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+1.  **Clone the repo**
+    ```sh
+    git clone <YOUR_GIT_URL>
+    ```
+2.  **Navigate to the project directory**
+    ```sh
+    cd <YOUR_PROJECT_NAME>
+    ```
+3.  **Install NPM packages**
+    ```sh
+    npm install
+    ```
+4.  **Set up Supabase**
+    - This project uses Supabase for authentication. You will need to create a `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in a `.env` file in the root of the project.
+    - You can get these keys from your Supabase project dashboard.
+    ```
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
 
-**Use your preferred IDE**
+### Usage
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+To run the app in development mode, use the following command:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+This will start the development server and you can view the application in your browser at `http://localhost:5173` (the port may vary).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project Structure
 
-**Use GitHub Codespaces**
+The project has been simplified to its core components:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+-   **`src/`**: Contains all the source code.
+    -   **`pages/`**: Contains the main pages of the application (`Index`, `Login`, `MySpace`, `NotFound`, `ResetPassword`).
+    -   **`components/`**: Contains the reusable UI components.
+    -   **`hooks/`**: Contains custom React hooks.
+    -   **`integrations/`**: Contains the Supabase client configuration.
+-   **`public/`**: Contains public assets.
+-   **`README.md`**: This file.
 
-## What technologies are used for this project?
+## What was removed?
 
-This project is built with .
+This project has been simplified from a much larger application. The following features have been removed:
+- Admin dashboard
+- Articles and news section
+- Community features (members, events, projects)
+- Payment integration
+- Complex user profiles
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b63d3f66-c9e4-4f3c-8ec3-9f2713285b95) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+The goal of this simplification is to provide a clean and simple starting point for a new project.

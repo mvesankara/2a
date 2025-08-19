@@ -1,20 +1,31 @@
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
-// Je ne peux pas modifier directement le fichier Header.tsx car il est en lecture seule.
-// Je vais créer un fichier HeaderWithNotifications.tsx qui étend le composant Header existant
+const Header = () => {
+  const { user, signOut } = useAuth();
 
-import React from "react";
-import Header from "./Header";
-import { NotificationDropdown } from "./ui/notification-dropdown";
-
-const HeaderWithNotifications: React.FC = () => {
   return (
-    <div className="relative">
-      <Header />
-      <div className="absolute top-4 right-20 md:right-24">
-        <NotificationDropdown />
+    <header className="flex items-center justify-between p-4 border-b">
+      <Link to="/" className="text-xl font-bold">
+        Lovable
+      </Link>
+      <div className="flex items-center gap-4">
+        {user ? (
+          <>
+            <Link to="/my-space">
+              <Button variant="ghost">My Space</Button>
+            </Link>
+            <Button onClick={signOut}>Logout</Button>
+          </>
+        ) : (
+          <Link to="/login">
+            <Button>Login</Button>
+          </Link>
+        )}
       </div>
-    </div>
+    </header>
   );
 };
 
-export default HeaderWithNotifications;
+export default Header;
