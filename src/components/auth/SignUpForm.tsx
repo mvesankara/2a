@@ -55,17 +55,22 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
       
       if (data?.user) {
         await supabase.from("profiles").insert({
-        id: data.user.id,
+        id: data.user.id,    
         email: data.user.email,
         full_name: `${firstName} ${lastName}`,
-        role: "adherent" // Changé de "membre" à "adherent" pour correspondre à l'enum
+        role: "adherent", // Changé de "membre" à "adherent" pour correspondre à l'enum
+        is_email_verified: false,
       });
+
+      // Envoyer un email de vérification
+      await supabase.auth.resend({ type: "signup", email });    
     }   
 
 
       toast({
         title: "Inscription réussie",
-        description: "Bienvenue ! Vous pouvez maintenant vous connecter.",
+        description: 
+        "Bienvenue ! Vous pouvez maintenant vous connecter.Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.",
       });
       onToggleMode();
     } catch (error: any) {

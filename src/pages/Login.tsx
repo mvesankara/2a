@@ -16,7 +16,7 @@ const Login = () => {
   const [isResetMode, setIsResetMode] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading,emailVerified } = useAuth();
 
   /**
    * Effect qui redirige vers le tableau de bord si l'utilisateur est déjà connecté
@@ -24,9 +24,13 @@ const Login = () => {
   useEffect(() => {
     if (user && !loading) {
       console.log("User already logged in, redirecting to dashboard");
-      navigate("/my-space", { replace: true });
-    }
-  }, [user, loading, navigate]);
+      if(!emailVerified){
+        navigate("/my-space", { replace: true });
+      } else {
+        navigate("/verify-email", { replace: true });
+      }      
+    }  
+  }, [user, loading, emailVerified, navigate]);
 
   /**
    * Détermine le titre à afficher selon le mode actuel

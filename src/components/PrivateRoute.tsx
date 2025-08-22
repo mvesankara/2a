@@ -1,4 +1,3 @@
-
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -9,13 +8,13 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute = ({ element }: PrivateRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, loading, emailVerified } = useAuth();
 
   useEffect(() => {
-    console.log("PrivateRoute - User state:", { user, loading });
-  }, [user, loading]);
+    console.log("PrivateRoute - User state:", { user, loading, emailVerified });
+  }, [user, loading, emailVerified]);
 
-  if (loading) {
+ if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -27,6 +26,11 @@ const PrivateRoute = ({ element }: PrivateRouteProps) => {
   if (!user) {
     console.log("PrivateRoute - User not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
+  }
+
+  if (!emailVerified) {
+    console.log("PrivateRoute - Email not verified, redirecting to verify-email page");
+    return <Navigate to="/verify-email" replace />;
   }
 
   console.log("PrivateRoute - User authenticated, rendering protected content");

@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  emailVerified?: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -14,13 +15,16 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
+  emailVerified: false,
   signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
     const fetchSessionAndListen = async () => {
@@ -42,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(null);
       } finally {
         // Set loading to false only after the initial check is complete
-        setLoading(false);
+        setAuthLoading(false);
       }
 
       // Then, set up the auth state change listener
@@ -60,18 +64,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribePromise = fetchSessionAndListen();
 
     return () => {
-      unsubscribePromise.then(unsubscribe => unsubscribe && unsubscribe());
+      unsubscribePromise.then((unsubscribe) => unsubscribe && unsubscribe());
     };
   }, []);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        setEmailVerified(false);
+        return;
+      }
+      setProfileLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("is_email_verified")
+        .eq("id", user.id)
+        .single();  
+      if (error) {
+        console.error("Error fetching profile:", error);
+        setEmailVerified(false);
+      } else {
+        setEmailVerified(data?.is_email_verified ?? false);
+      }
+      setProfileLoading(false);
+    }; 
+    loadProfile();
+  }, [user]);
 
   const signOut = async () => {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
+      setEmailVerified(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading,signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading: authLoading || profileLoading, 
+      emailVerified,
+      signOut
+      }}
+      >
       {children}
     </AuthContext.Provider>
   );
