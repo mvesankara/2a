@@ -1,41 +1,36 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { AuthProvider, useAuth } from '@/hooks/useAuth';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import SignUpForm from '@/components/auth/SignUpForm';
 import { vi } from 'vitest';
 
-const user = { id: '1', email: 'test@example.com' } as any;
-const session = { user } as any;
-
-const mockGetSession = vi.fn().mockResolvedValue({ data: { session }, error: null });
-const mockOnAuthStateChange = vi.fn((cb: any) => {
-  cb('SIGNED_IN', session);
-  return { data: { subscription: { unsubscribe: vi.fn() } } };
-});
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({ toast: vi.fn() })
+}));
+ 
+const mockSignUp = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({ data: { user: { id: '1', email: 'test@example.com' } }, error: null })
+);
+const mockInsert = vi.hoisted(() => vi.fn().mockResolvedValue({}));
+const mockFrom = vi.hoisted(() => vi.fn(() => ({ insert: mockInsert })));
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    auth: {
-      getSession: mockGetSession,
-      onAuthStateChange: mockOnAuthStateChange,
-    },
-  },
+  supabase: { auth: { signUp: mockSignUp }, from: mockFrom }
 }));
+ 
+describe('SignUpForm', () => {
+  it('submits sign up data', async () => {
+    const onToggleMode = vi.fn();
+    render(<SignUpForm onToggleMode={onToggleMode} />);
 
-function TestComponent() {
-  const { user, loading } = useAuth();
-  if (loading) return <div>loading</div>;
-  return <div>{user ? user.email : 'no-user'}</div>;
-}
-
-describe('useAuth', () => {
-  it('provides user from supabase', async () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
-
+    fireEvent.change(screen.getByLabelText(/prénom/i), { target: { value: 'John' } });
+    fireEvent.change(screen.getByLabelText(/^nom$/i), { target: { value: 'Doe' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByLabelText(/mot de passe/i), { target: { value: 'password' } });
+    fireEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
+ 
     await waitFor(() => {
-      expect(screen.getByText('test@example.com')).toBeInTheDocument();
+      expect(mockSignUp).toHaveBeenCalled();
+      expect(mockInsert).toHaveBeenCalled();
     });
+    expect(onToggleMode).toHaveBeenCalled();
   });
 });

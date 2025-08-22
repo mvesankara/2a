@@ -6,8 +6,8 @@ vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({ toast: vi.fn() })
 }));
 
-const mockReset = vi.fn().mockResolvedValue({ error: null });
-vi.mock('@/integrations/supabase/client', () => ({
+const mockReset = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }));
+ vi.mock('@/integrations/supabase/client', () => ({
   supabase: { auth: { resetPasswordForEmail: mockReset } }
 }));
 
@@ -20,7 +20,7 @@ describe('ResetPasswordForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /envoyer le lien/i }));
 
     await waitFor(() => {
-      expect(mockReset).toHaveBeenCalled();
+     expect(mockReset).toHaveBeenCalled();
     });
   });
 
@@ -31,3 +31,4 @@ describe('ResetPasswordForm', () => {
     expect(onCancel).toHaveBeenCalled();
   });
 });
+

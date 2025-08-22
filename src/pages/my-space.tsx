@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +24,7 @@ const MySpace = () => {
     country: "",
     personal_description: "",
   });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -52,6 +54,7 @@ const MySpace = () => {
         country: profile.country ?? "",
         personal_description: profile.personal_description ?? "",
       });
+      setAvatarUrl(profile.avatar_url ?? null);
     }
   }, [profile]);
 
@@ -69,9 +72,9 @@ const MySpace = () => {
     },
     onError: (err: unknown) => {
       const message = err instanceof Error ? err.message : String(err);
-      toast({ 
-        title: "Erreur", 
-        description: message, 
+      toast({
+        title: "Erreur",
+        description: message,
         variant: "destructive",
       });
     },
@@ -83,11 +86,54 @@ const MySpace = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleAvatarChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${user.id}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(fileName, file, { upsert: true });
+    if (uploadError) {
+      toast({
+        title: "Erreur",
+        description: uploadError.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+    setAvatarUrl(publicUrl);
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: publicUrl })
+      .eq("id", user.id);
+
+    if (updateError) {
+      toast({
+        title: "Erreur",
+        description: updateError.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Avatar mis a jour" });
+      queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfile.mutate(formData);
   };
-
 
   if (!user) {
     return null;
@@ -100,6 +146,26 @@ const MySpace = () => {
         <h1 className="text-3xl font-bold mb-4">Mon profil</h1>
         <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
           <div>
+            <label htmlFor="avatar" className="block text-sm font-medium">
+              Avatar
+            </label>
+            <div className="flex items-center space-x-4 mt-2">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={avatarUrl ?? undefined} />
+                <AvatarFallback>
+                  {(formData.first_name?.[0] || "") +
+                    (formData.last_name?.[0] || "")}
+                </AvatarFallback>
+              </Avatar>
+              <Input
+                id="avatar"
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+              />
+            </div>
+          </div>
+          <div>
             <label htmlFor="first_name" className="block text-sm font-medium">
               Prénom
             </label>
@@ -108,7 +174,7 @@ const MySpace = () => {
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
-              />
+            />
           </div>
           <div>
             <label htmlFor="last_name" className="block text-sm font-medium">
@@ -146,7 +212,10 @@ const MySpace = () => {
             </div>
           </div>
           <div>
-            <label htmlFor="personal_description" className="block text-sm font-medium">
+            <label
+              htmlFor="personal_description"
+              className="block text-sm font-medium"
+            >
               Description personnelle
             </label>
             <Textarea
@@ -154,7 +223,7 @@ const MySpace = () => {
               name="personal_description"
               value={formData.personal_description}
               onChange={handleChange}
-              />
+            />
           </div>
           <Button type="submit" disabled={updateProfile.isLoading}>
             Enregistrer
