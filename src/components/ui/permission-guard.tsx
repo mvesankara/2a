@@ -1,9 +1,10 @@
+"use client";
 
-import React from 'react';
-import { usePermissions } from '@/hooks/usePermissions';
-import { UserRole } from '@/types/roles';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import React from "react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { UserRole } from "@/types/roles";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 interface PermissionGuardProps {
   children: React.ReactNode;
@@ -13,16 +14,15 @@ interface PermissionGuardProps {
   loadingComponent?: React.ReactNode;
 }
 
-export const PermissionGuard: React.FC<PermissionGuardProps> = ({ 
-  children, 
-  permission, 
-  role, 
-  fallback, 
-  loadingComponent 
+export const PermissionGuard: React.FC<PermissionGuardProps> = ({
+  children,
+  permission,
+  role,
+  fallback,
+  loadingComponent
 }) => {
   const { hasPermission, hasRole, loading } = usePermissions();
-  
-  // Show loading state
+
   if (loading) {
     return loadingComponent || (
       <div className="flex justify-center items-center p-4">
@@ -30,35 +30,28 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
       </div>
     );
   }
-  
-  // Check permission if specified
+
   if (permission && !hasPermission(permission)) {
     return fallback || (
       <Card>
-        <CardHeader>
-          <CardTitle>Accès restreint</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Accès restreint</CardTitle></CardHeader>
         <CardContent>
-          <p>Vous n'avez pas les permissions nécessaires pour accéder à cette fonctionnalité.</p>
+          <p>Vous n&apos;avez pas les permissions nécessaires pour accéder à cette fonctionnalité.</p>
         </CardContent>
       </Card>
     );
   }
-  
-  // Check role if specified
+
   if (role && !hasRole(role)) {
     return fallback || (
       <Card>
-        <CardHeader>
-          <CardTitle>Accès restreint</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Accès restreint</CardTitle></CardHeader>
         <CardContent>
           <p>Vous devez avoir le rôle {role} pour accéder à cette fonctionnalité.</p>
         </CardContent>
       </Card>
     );
   }
-  
-  // If all checks pass, render children
+
   return <>{children}</>;
 };

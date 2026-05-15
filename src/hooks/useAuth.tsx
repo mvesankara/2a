@@ -1,117 +1,67 @@
+"use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import { authApi, setToken, clearToken, type Profile } from "@/lib/api";
+
+interface AuthUser {
+  id: string;
+  email: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  profile: Profile | null;
   loading: boolean;
-  emailVerified?: boolean;
-  signOut: () => Promise<void>;
+  login: (token: string, user: AuthUser, profile: Profile) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
+  profile: null,
   loading: true,
-  emailVerified: false,
-  signOut: async () => {},
+  login: () => {},
+  signOut: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSessionAndListen = async () => {
-      try {
-        // First, get the current session
-        const { data: { session }, error } = await supabase.auth.getSession();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-        if (error) {
-          throw error;
-        }
-
-        console.log("Current session:", session);
-        setUser(session?.user ?? null);
-        setSession(session);
-      } catch (error) {
-        console.error("Error fetching initial session:", error);
-        // Set user and session to null if there's an error
-        setUser(null);
-        setSession(null);
-      } finally {
-        // Set loading to false only after the initial check is complete
-        setAuthLoading(false);
-      }
-
-      // Then, set up the auth state change listener
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        console.log("Auth state changed:", _event, session);
-        setUser(session?.user ?? null);
-        setSession(session);
-      });
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    };
-
-    const unsubscribePromise = fetchSessionAndListen();
-
-    return () => {
-      unsubscribePromise.then((unsubscribe) => unsubscribe && unsubscribe());
-    };
+    authApi.me()
+      .then(({ id, email, profile }) => {
+        setUser({ id, email });
+        setProfile(profile);
+      })
+      .catch(() => clearToken())
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) {
-        setEmailVerified(false);
-        return;
-      }
-      setProfileLoading(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("is_email_verified")
-        .eq("id", user.id)
-        .single();  
-      if (error) {
-        console.error("Error fetching profile:", error);
-        setEmailVerified(false);
-      } else {
-        setEmailVerified(data?.is_email_verified ?? false);
-      }
-      setProfileLoading(false);
-    }; 
-    loadProfile();
-  }, [user]);
+  const login = (token: string, authUser: AuthUser, userProfile: Profile) => {
+    setToken(token);
+    setUser(authUser);
+    setProfile(userProfile);
+  };
 
-  const signOut = async () => {
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      setEmailVerified(false);
+  const signOut = () => {
+    clearToken();
+    setUser(null);
+    setProfile(null);
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      loading: authLoading || profileLoading, 
-      emailVerified,
-      signOut
-      }}
-      >
+    <AuthContext.Provider value={{ user, profile, loading, login, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
