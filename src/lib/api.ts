@@ -3,9 +3,10 @@ function getToken(): string | null {
   return localStorage.getItem("token");
 }
 
-export function setToken(token: string) {
+export function setToken(token: string, rememberMe = true) {
   localStorage.setItem("token", token);
-  document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; samesite=lax`;
+  const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24; // 30 jours ou 1 jour
+  document.cookie = `token=${token}; path=/; max-age=${maxAge}; samesite=lax`;
 }
 
 export function clearToken() {
@@ -39,10 +40,10 @@ export const authApi = {
       body: JSON.stringify({ email, password }),
     }),
 
-  login: (email: string, password: string) =>
+  login: (identifier: string, password: string, rememberMe = false) =>
     request<{ token: string; user: { id: string; email: string }; profile: Profile }>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password, rememberMe }),
     }),
 
   me: () =>
@@ -120,3 +121,36 @@ export interface ProfileUpdate {
   skills: string[];
   associationContribution: string;
 }
+
+// Tasks
+export interface TaskItem {
+  id: string;
+  title: string;
+  description: string | null;
+  status: "todo" | "in_progress" | "done" | "review";
+  dueDate: string | null;
+  priority: string | null;
+  projectId: string | null;
+  project: { id: string; name: string } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const taskApi = {
+  list: () => request<TaskItem[]>("/tasks"),
+
+  create: (data: { title: string; description?: string; dueDate?: string; projectId?: string; priority?: string }) =>
+    request<TaskItem>("/tasks", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: string, data: Partial<{ title: string; status: TaskItem["status"]; dueDate: string | null; priority: string }>) =>
+    request<TaskItem>(`/tasks/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/tasks/${id}`, { method: "DELETE" }),
+};

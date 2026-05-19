@@ -11,9 +11,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface SignUpFormProps {
   onToggleMode: () => void;
+  redirectTo?: string;
 }
 
-const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
+const SignUpForm = ({ onToggleMode, redirectTo = "/dashboard" }: SignUpFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -36,7 +37,7 @@ const SignUpForm = ({ onToggleMode }: SignUpFormProps) => {
       }
 
       toast({ title: "Inscription réussie", description: "Bienvenue ! Votre compte a été créé." });
-      router.replace("/my-space");
+      router.replace(redirectTo);
     } catch (error: unknown) {
       toast({
         title: "Erreur",

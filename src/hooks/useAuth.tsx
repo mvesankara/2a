@@ -12,7 +12,7 @@ interface AuthContextType {
   user: AuthUser | null;
   profile: Profile | null;
   loading: boolean;
-  login: (token: string, user: AuthUser, profile: Profile) => void;
+  login: (token: string, user: AuthUser, profile: Profile, rememberMe?: boolean) => void;
   signOut: () => void;
 }
 
@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = (token: string, authUser: AuthUser, userProfile: Profile) => {
-    setToken(token);
+  const login = (token: string, authUser: AuthUser, userProfile: Profile, rememberMe = true) => {
+    setToken(token, rememberMe);
     setUser(authUser);
     setProfile(userProfile);
   };
