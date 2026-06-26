@@ -1,11 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Bell, Search, ChevronDown, Menu } from "lucide-react";
+import { Bell, Search, ChevronDown, Menu, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Tableau de bord",
+  "/dashboard/espace-personnel": "Espace personnel",
+  "/dashboard/profil":  "Profil",
+  "/dashboard/projets":         "Projets",
+  "/dashboard/projets/nouveau": "Nouveau projet",
   "/my-space": "Espace personnel",
   "/dashboard/taches": "Mes tâches",
   "/dashboard/notifications": "Notifications",
@@ -15,6 +19,8 @@ const pageTitles: Record<string, string> = {
   "/dashboard/parametres": "Paramètres",
 };
 
+interface BreadcrumbItem { label: string; href?: string }
+
 interface DashboardHeaderProps {
   unreadCount: number;
   profile: {
@@ -23,6 +29,7 @@ interface DashboardHeaderProps {
     avatarUrl: string | null;
     role: string | null;
   };
+  breadcrumb?: BreadcrumbItem[];
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -32,9 +39,14 @@ const ROLE_LABELS: Record<string, string> = {
   administrateur: "Admin",
 };
 
-export default function DashboardHeader({ unreadCount, profile }: DashboardHeaderProps) {
+export default function DashboardHeader({ unreadCount, profile, breadcrumb }: DashboardHeaderProps) {
   const pathname = usePathname();
   const title = pageTitles[pathname] ?? "Tableau de bord";
+
+  // Back arrow for dynamic sub-pages (e.g. /dashboard/projets/[id])
+  const isProjectDetail = /^\/dashboard\/projets\/[^/]+$/.test(pathname) &&
+    pathname !== "/dashboard/projets/nouveau";
+  const backHref = isProjectDetail ? "/dashboard/projets" : null;
 
   const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "Membre";
   const roleLabel = profile.role ? (ROLE_LABELS[profile.role] ?? profile.role) : "Membre";
@@ -48,7 +60,29 @@ export default function DashboardHeader({ unreadCount, profile }: DashboardHeade
         <button className="lg:hidden p-1 text-gray-500 hover:text-primary">
           <Menu size={20} />
         </button>
-        <h1 className="text-lg font-bold text-gray-800">{title}</h1>
+        {backHref && !breadcrumb && (
+          <Link href={backHref} className="p-1.5 rounded-lg text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors" aria-label="Retour">
+            <ArrowLeft size={18} />
+          </Link>
+        )}
+        {breadcrumb ? (
+          <nav className="flex items-center gap-1.5 text-sm" aria-label="Fil d'Ariane">
+            {breadcrumb.map((item, i) => (
+              <span key={i} className="flex items-center gap-1.5">
+                {i > 0 && <span className="text-gray-300">›</span>}
+                {item.href ? (
+                  <Link href={item.href} className="text-gray-500 hover:text-primary transition-colors font-medium">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className="text-gray-800 font-bold">{item.label}</span>
+                )}
+              </span>
+            ))}
+          </nav>
+        ) : (
+          <h1 className="text-lg font-bold text-gray-800">{isProjectDetail ? "Détail du projet" : title}</h1>
+        )}
       </div>
 
       {/* Search */}

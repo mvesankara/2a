@@ -46,12 +46,11 @@ export default function ProfilTab({ profile }: ProfilTabProps) {
         personalDescription: form.personalDescription,
         skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
         associationContribution: form.associationContribution,
-        // Extended fields
         phone: form.phone,
         gender: form.gender,
         motivation: form.motivation,
         dateOfBirth: form.dateOfBirth || null,
-      } as Parameters<typeof profileApi.update>[0]);
+      });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({ title: "Profil mis à jour" });
     } catch (err) {

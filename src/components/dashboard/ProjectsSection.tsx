@@ -27,7 +27,7 @@ export default function ProjectsSection({ projects }: { projects: ProjectCard[] 
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-bold text-gray-800">Mes projets récents</h3>
-        <Link href="/projets" className="text-xs text-primary font-semibold hover:underline">
+        <Link href="/dashboard/projets" className="text-xs text-primary font-semibold hover:underline">
           Voir tous
         </Link>
       </div>

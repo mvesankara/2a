@@ -1,4 +1,4 @@
-function getToken(): string | null {
+export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("token");
 }
@@ -102,12 +102,21 @@ export interface Profile {
   avatarUrl: string | null;
   city: string | null;
   country: string | null;
+  address: string | null;
   personalDescription: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  phone: string | null;
+  profession: string | null;
+  organization: string | null;
   role: string | null;
   status: string;
   isEmailVerified: boolean;
   skills: string[];
+  interests: string[];
   associationContribution: string | null;
+  membershipType: string | null;
+  membershipExpiresAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -117,9 +126,19 @@ export interface ProfileUpdate {
   lastName: string;
   city: string;
   country: string;
+  address: string;
   personalDescription: string;
   skills: string[];
   associationContribution: string;
+  phone: string;
+  gender: string;
+  motivation: string;
+  dateOfBirth: string | null;
+  profession: string;
+  organization: string;
+  interests: string[];
+  membershipType: string;
+  membershipExpiresAt: string | null;
 }
 
 // Tasks
@@ -154,3 +173,74 @@ export const taskApi = {
   delete: (id: string) =>
     request<{ success: boolean }>(`/tasks/${id}`, { method: "DELETE" }),
 };
+
+// Projects
+export const projectApi = {
+  create: (data: Partial<ProjectCreate>) =>
+    request<ProjectItem>("/projects", { method: "POST", body: JSON.stringify(data) }),
+
+  update: (id: string, data: Partial<ProjectCreate>) =>
+    request<ProjectItem>(`/projects/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+
+  uploadImage: async (id: string, file: File): Promise<{ imageUrl: string }> => {
+    const token = getToken();
+    const form = new FormData();
+    form.append("image", file);
+    const res = await fetch(`/api/projects/${id}/image`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error ?? `Erreur ${res.status}`);
+    }
+    return res.json();
+  },
+};
+
+export interface ProjectCreate {
+  name: string;
+  category: string;
+  city: string;
+  country: string;
+  shortDescription: string;
+  problemStatement: string;
+  startDate: string | null;
+  estimatedDuration: string;
+  objectives: string;
+  plannedActivities: string;
+  targetBeneficiaries: string;
+  successIndicators: string;
+  budget: string;
+  budgetSources: string;
+  humanResources: string;
+  materialResources: string;
+  isPublished: boolean;
+  status: string;
+}
+
+export interface ProjectItem {
+  id: string;
+  name: string;
+  category: string | null;
+  city: string | null;
+  country: string | null;
+  shortDescription: string | null;
+  problemStatement: string | null;
+  estimatedDuration: string | null;
+  objectives: string | null;
+  plannedActivities: string | null;
+  targetBeneficiaries: string | null;
+  successIndicators: string | null;
+  budget: number | null;
+  budgetSources: string | null;
+  humanResources: string | null;
+  materialResources: string | null;
+  imageUrl: string | null;
+  isPublished: boolean;
+  status: string;
+  progress: number;
+  startDate: string | null;
+  createdAt: string | null;
+}

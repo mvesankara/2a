@@ -1,17 +1,18 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Camera, MapPin, Mail, Phone, Pencil, Loader2 } from "lucide-react";
 import { profileApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-const ROLE_LABELS: Record<string, string> = {
-  adherent: "Adhérent",
-  membre_bureau: "Bureau",
-  sympathisant: "Sympathisant",
-  administrateur: "Admin",
+const ROLE_META: Record<string, { label: string; cls: string }> = {
+  adherent:       { label: "Adhérent",     cls: "bg-green-500 text-white" },
+  membre_bureau:  { label: "Bureau",       cls: "bg-primary text-white" },
+  sympathisant:   { label: "Sympathisant", cls: "bg-blue-500 text-white" },
+  administrateur: { label: "Admin",        cls: "bg-red-500 text-white" },
 };
 
 interface ProfileHeaderProps {
@@ -27,7 +28,7 @@ interface ProfileHeaderProps {
     personalDescription: string | null;
     createdAt: string;
   };
-  onEditProfile: () => void;
+  onEditProfile?: () => void;
 }
 
 export default function ProfileHeader({ profile, onEditProfile }: ProfileHeaderProps) {
@@ -37,7 +38,7 @@ export default function ProfileHeader({ profile, onEditProfile }: ProfileHeaderP
   const { toast } = useToast();
 
   const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(" ") || "Membre";
-  const roleLabel = profile.role ? (ROLE_LABELS[profile.role] ?? profile.role) : "Membre";
+  const roleMeta = profile.role ? (ROLE_META[profile.role] ?? { label: profile.role, cls: "bg-green-500 text-white" }) : { label: "Membre", cls: "bg-green-500 text-white" };
   const initials = [profile.firstName?.[0], profile.lastName?.[0]].filter(Boolean).join("").toUpperCase() || "M";
   const memberSince = format(new Date(profile.createdAt), "d MMMM yyyy", { locale: fr });
   const location = [profile.city, profile.country].filter(Boolean).join(", ");
@@ -88,8 +89,8 @@ export default function ProfileHeader({ profile, onEditProfile }: ProfileHeaderP
             <div>
               <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-2xl font-black text-primary">{displayName}</h2>
-                <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
-                  {roleLabel}
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${roleMeta.cls}`}>
+                  {roleMeta.label}
                 </span>
               </div>
               <p className="text-sm text-gray-400 mt-0.5">Membre depuis le {memberSince}</p>
@@ -99,13 +100,13 @@ export default function ProfileHeader({ profile, onEditProfile }: ProfileHeaderP
                 </p>
               )}
             </div>
-            <button
-              onClick={onEditProfile}
+            <Link
+              href="/dashboard/profil"
               className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
             >
               <Pencil size={15} />
               Modifier mon profil
-            </button>
+            </Link>
           </div>
 
           {/* Contact info */}

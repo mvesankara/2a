@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/espace-personnel", icon: User, label: "Espace personnel" },
-  { href: "/projets", icon: FolderOpen, label: "Projets" },
+  { href: "/dashboard/projets", icon: FolderOpen, label: "Projets" },
   { href: "/dashboard/taches", icon: CheckSquare, label: "Mes tâches" },
   { href: "/actualites", icon: Newspaper, label: "Articles" },
   { href: "/dashboard/participations", icon: Star, label: "Mes participations" },
@@ -74,9 +74,13 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-0.5">
         {navItems.map(({ href, icon: Icon, label, badge }) => {
+          const aliases: Record<string, string[]> = {
+            "/dashboard/espace-personnel": ["/dashboard/profil"],
+          };
           const isActive =
             pathname === href ||
-            (href !== "/dashboard" && pathname.startsWith(href));
+            (href !== "/dashboard" && pathname.startsWith(href)) ||
+            (aliases[href] ?? []).some((a) => pathname.startsWith(a));
           return (
             <Link
               key={href}

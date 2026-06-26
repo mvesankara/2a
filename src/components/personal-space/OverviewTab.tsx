@@ -3,6 +3,7 @@ import { fr } from "date-fns/locale";
 import {
   Users, CheckSquare, Clock, Newspaper, CalendarDays,
   FileText, TrendingUp, MessageSquare, FolderOpen, ImageOff,
+  UserRound, Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +47,11 @@ function Card({ title, action, href, children }: { title: string; action?: strin
 }
 
 function AboutCard({ profile }: { profile: { personalDescription: string | null; dateOfBirth: string | null; gender: string | null; country: string | null } }) {
+  const infoFields = [
+    { Icon: CalendarDays, label: "Date de naissance", value: profile.dateOfBirth ? format(new Date(profile.dateOfBirth), "d MMMM yyyy", { locale: fr }) : "—" },
+    { Icon: UserRound,    label: "Genre",             value: profile.gender ?? "—" },
+    { Icon: Globe,        label: "Pays",              value: profile.country ?? "—" },
+  ];
   return (
     <Card title="À propos de moi">
       {profile.personalDescription ? (
@@ -53,15 +59,13 @@ function AboutCard({ profile }: { profile: { personalDescription: string | null;
       ) : (
         <p className="text-sm text-gray-400 italic">Aucune description renseignée.</p>
       )}
-      <div className="grid grid-cols-3 gap-3 pt-1 border-t border-gray-50">
-        {[
-          { label: "Date de naissance", value: profile.dateOfBirth ? format(new Date(profile.dateOfBirth), "d MMMM yyyy", { locale: fr }) : "—" },
-          { label: "Genre", value: profile.gender ?? "—" },
-          { label: "Pays", value: profile.country ?? "—" },
-        ].map(({ label, value }) => (
-          <div key={label} className="flex flex-col items-center gap-1 text-center">
-            <CalendarDays size={16} className="text-gray-300" />
-            <p className="text-xs text-gray-500">{label}</p>
+      <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-100">
+        {infoFields.map(({ Icon, label, value }) => (
+          <div key={label} className="flex flex-col items-center gap-1.5 text-center">
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+              <Icon size={15} className="text-primary/60" />
+            </div>
+            <p className="text-[10px] text-gray-400 leading-tight">{label}</p>
             <p className="text-xs font-semibold text-gray-700">{value}</p>
           </div>
         ))}
@@ -72,7 +76,7 @@ function AboutCard({ profile }: { profile: { personalDescription: string | null;
 
 function ProjectsCard({ projects }: { projects: Array<{ id: string; name: string; imageUrl: string | null; progress: number; status: string; memberRole: string | null }> }) {
   return (
-    <Card title="Mes projets" action="Voir tous" href="/projets">
+    <Card title="Mes projets" action="Voir tous" href="/dashboard/projets">
       {projects.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-4">Aucun projet rejoint.</p>
       ) : (
@@ -139,7 +143,17 @@ function EngagementCard({ engagement }: {
   );
 }
 
-function ActivitiesCard({ activities }: { activities: Array<{ id: string; type: string; title: string; description: string; createdAt: string }> }) {
+const ICON_ACTIVITY_TYPES = new Set(["task_completed", "project_joined", "task", "invitation"]);
+
+function ActivitiesCard({
+  activities,
+  avatarUrl,
+  initials,
+}: {
+  activities: Array<{ id: string; type: string; title: string; description: string; createdAt: string }>;
+  avatarUrl: string | null;
+  initials: string;
+}) {
   return (
     <Card title="Activités récentes" action="Voir tout" href="/dashboard/espace-personnel?tab=activites">
       {activities.length === 0 ? (
@@ -147,13 +161,25 @@ function ActivitiesCard({ activities }: { activities: Array<{ id: string; type: 
       ) : (
         <div className="space-y-4">
           {activities.map((a) => {
+            const useIcon = ICON_ACTIVITY_TYPES.has(a.type);
             const iconInfo = ACTIVITY_ICONS[a.type] ?? { Icon: MessageSquare, cls: "bg-gray-100 text-gray-500" };
             const Icon = iconInfo.Icon;
             return (
               <div key={a.id} className="flex items-start gap-3">
-                <div className={cn("w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5", iconInfo.cls)}>
-                  <Icon size={15} />
-                </div>
+                {useIcon ? (
+                  <div className={cn("w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5", iconInfo.cls)}>
+                    <Icon size={15} />
+                  </div>
+                ) : (
+                  <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 mt-0.5 bg-primary/10 flex items-center justify-center ring-2 ring-white">
+                    {avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-bold text-primary">{initials}</span>
+                    )}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-700 leading-snug">
                     <span className="font-semibold">{a.title}</span>{" "}
@@ -232,6 +258,9 @@ function DocumentsCard({ documents }: { documents: Array<{ id: string; name: str
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export default function OverviewTab({ data }: { data: any }) {
+  const initials = [data.profile.firstName?.[0], data.profile.lastName?.[0]]
+    .filter(Boolean).join("").toUpperCase() || "M";
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_300px] gap-5 items-start">
       {/* Left column */}
@@ -243,7 +272,11 @@ export default function OverviewTab({ data }: { data: any }) {
       {/* Center column */}
       <div className="flex flex-col gap-5">
         <EngagementCard engagement={data.engagement} />
-        <ActivitiesCard activities={data.activities} />
+        <ActivitiesCard
+          activities={data.activities}
+          avatarUrl={data.profile.avatarUrl}
+          initials={initials}
+        />
       </div>
 
       {/* Right column */}

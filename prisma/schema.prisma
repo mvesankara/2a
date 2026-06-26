@@ -72,8 +72,13 @@ model Profile {
   gender                  String?
   address                 String?
   phone                   String?
+  profession              String?
+  organization            String?
   motivation              String?
   howDidYouHear           String?       @map("how_did_you_hear")
+  interests               String[]
+  membershipType          String?       @map("membership_type")
+  membershipExpiresAt     DateTime?     @map("membership_expires_at")
   idDocumentUrl           String?       @map("id_document_url")
   role                    UserRole?
   status                  ProfileStatus @default(pending)
@@ -89,6 +94,7 @@ model Profile {
   eventParticipants EventParticipant[]
   projectMembers    ProjectMember[]
   personalProjects  PersonalProject[]
+  createdProjects   Project[]         @relation("ProjectCreator")
   tasks             Task[]
 
   @@map("profiles")
@@ -104,14 +110,59 @@ model Project {
   isPublished      Boolean       @default(false) @map("is_published")
   status           ProjectStatus @default(en_cours)
   progress         Int           @default(0)
-  startDate        DateTime?     @map("start_date")
-  endDate          DateTime?     @map("end_date")
-  createdAt        DateTime?     @default(now()) @map("created_at")
-  updatedAt        DateTime?     @updatedAt @map("updated_at")
-  members          ProjectMember[]
-  tasks            Task[]
+  city                String?
+  country             String?       @default("Gabon")
+  problemStatement    String?       @map("problem_statement")
+  estimatedDuration   String?       @map("estimated_duration")
+  objectives          String?
+  plannedActivities   String?       @map("planned_activities")
+  targetBeneficiaries String?       @map("target_beneficiaries")
+  successIndicators   String?       @map("success_indicators")
+  budget              Float?
+  budgetSources       String?       @map("budget_sources")
+  humanResources      String?       @map("human_resources")
+  materialResources   String?       @map("material_resources")
+  priority            String?
+  budgetSpent         Float?        @map("budget_spent")
+  createdByProfileId  String?       @map("created_by_profile_id")
+  createdByProfile    Profile?      @relation("ProjectCreator", fields: [createdByProfileId], references: [id], onDelete: SetNull)
+  startDate           DateTime?     @map("start_date")
+  endDate             DateTime?     @map("end_date")
+  createdAt           DateTime?     @default(now()) @map("created_at")
+  updatedAt           DateTime?     @updatedAt @map("updated_at")
+  members             ProjectMember[]
+  tasks               Task[]
+  activities          ProjectActivity[]
+  indicators          ProjectIndicator[]
+  documents           Document[]
 
   @@map("projects")
+}
+
+model ProjectActivity {
+  id        String    @id @default(uuid())
+  projectId String    @map("project_id")
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title     String
+  date      DateTime?
+  status    String    @default("a_venir")
+  order     Int       @default(0)
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("project_activities")
+}
+
+model ProjectIndicator {
+  id        String  @id @default(uuid())
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label     String
+  current   Float   @default(0)
+  target    Float
+  unit      String?
+  order     Int     @default(0)
+
+  @@map("project_indicators")
 }
 
 model Subscriber {
@@ -142,8 +193,10 @@ model Task {
   status      TaskStatus @default(todo)
   dueDate     DateTime?  @map("due_date")
   priority    String?    @default("normal")
-  profileId   String     @map("profile_id")
-  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  progress    Int        @default(0)
+  isBlocked   Boolean    @default(false)  @map("is_blocked")
+  profileId   String?    @map("profile_id")
+  profile     Profile?   @relation(fields: [profileId], references: [id], onDelete: SetNull)
   projectId   String?    @map("project_id")
   project     Project?   @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt   DateTime   @default(now()) @map("created_at")
@@ -165,13 +218,15 @@ model ProjectMember {
 }
 
 model Document {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  fileType  String    @default("PDF") @map("file_type")
+  fileType  String   @default("PDF") @map("file_type")
   url       String?
-  sizeBytes Int?      @map("size_bytes")
-  isPublic  Boolean   @default(true) @map("is_public")
-  createdAt DateTime  @default(now()) @map("created_at")
+  sizeBytes Int?     @map("size_bytes")
+  isPublic  Boolean  @default(true) @map("is_public")
+  projectId String?  @map("project_id")
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("documents")
 }

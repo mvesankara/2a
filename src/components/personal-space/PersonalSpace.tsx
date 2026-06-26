@@ -91,7 +91,7 @@ function PersonalSpaceInner({ data }: PersonalSpaceProps) {
           </p>
         </div>
         <a
-          href="/projets"
+          href="/dashboard/projets"
           className="flex items-center gap-2 bg-primary text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors flex-shrink-0"
         >
           Découvrir les projets

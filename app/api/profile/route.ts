@@ -16,7 +16,8 @@ export async function PATCH(request: NextRequest) {
     const {
       firstName, lastName, city, country, personalDescription,
       skills, associationContribution, phone, gender, motivation,
-      dateOfBirth,
+      dateOfBirth, address, profession, organization, interests,
+      membershipType, membershipExpiresAt,
     } = body;
 
     const profile = await prisma.profile.update({
@@ -32,8 +33,16 @@ export async function PATCH(request: NextRequest) {
         ...(phone !== undefined && { phone }),
         ...(gender !== undefined && { gender }),
         ...(motivation !== undefined && { motivation }),
+        ...(address !== undefined && { address }),
+        ...(profession !== undefined && { profession }),
+        ...(organization !== undefined && { organization }),
+        ...(interests !== undefined && { interests }),
+        ...(membershipType !== undefined && { membershipType }),
         ...(dateOfBirth !== undefined && {
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        }),
+        ...(membershipExpiresAt !== undefined && {
+          membershipExpiresAt: membershipExpiresAt ? new Date(membershipExpiresAt) : null,
         }),
       },
     });
