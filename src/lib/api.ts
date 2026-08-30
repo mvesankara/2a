@@ -146,7 +146,7 @@ export interface TaskItem {
   id: string;
   title: string;
   description: string | null;
-  status: "todo" | "in_progress" | "done" | "review";
+  status: "todo" | "in_progress" | "paused" | "done" | "review";
   dueDate: string | null;
   priority: string | null;
   projectId: string | null;

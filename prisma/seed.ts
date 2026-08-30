@@ -146,10 +146,60 @@ async function main() {
       update: {},
       create: { id: m.profileId, userId: m.userId, firstName: m.firstName, lastName: m.lastName, email: m.email, status: "approved", role: "adherent" },
     });
-    await prisma.projectMember.upsert({
-      where: { id: `pm-${m.profileId}` },
+  }
+
+  // ─── Membres de proj-001 (équipe complète 10 membres) ────────────────────
+  const extraMembers = [
+    { userId: "user-jean-demo",   email: "jean.b@2a.ga",    profileId: "prof-jean-demo",   firstName: "Jean",    lastName: "B.",   role: "adherent" },
+    { userId: "user-sophie-demo", email: "sophie.n@2a.ga",  profileId: "prof-sophie-demo", firstName: "Sophie",  lastName: "N.",   role: "adherent" },
+    { userId: "user-alain-demo",  email: "alain.p@2a.ga",   profileId: "prof-alain-demo",  firstName: "Alain",   lastName: "P.",   role: "adherent" },
+    { userId: "user-linda-demo",  email: "linda.k@2a.ga",   profileId: "prof-linda-demo",  firstName: "Linda",   lastName: "K.",   role: "adherent" },
+    { userId: "user-mouandza-demo",email:"mouandza.k@2a.ga",profileId: "prof-mouandza-demo",firstName:"Mouandza",lastName:"K.",  role: "membre_bureau" },
+    { userId: "user-grace-demo",  email: "grace.l@2a.ga",   profileId: "prof-grace-demo",  firstName: "Grace",   lastName: "L.",   role: "adherent" },
+    { userId: "user-daniel-demo", email: "daniel.m@2a.ga",  profileId: "prof-daniel-demo", firstName: "Daniel",  lastName: "M.",   role: "adherent" },
+  ];
+  for (const m of extraMembers) {
+    await prisma.user.upsert({
+      where: { id: m.userId },
       update: {},
-      create: { id: `pm-${m.profileId}`, projectId: "proj-001", profileId: m.profileId, role: m.memberRole },
+      create: { id: m.userId, email: m.email, password: demoPwd },
+    });
+    await prisma.profile.upsert({
+      where: { id: m.profileId },
+      update: {},
+      create: { id: m.profileId, userId: m.userId, firstName: m.firstName, lastName: m.lastName, email: m.email, status: "approved", role: m.role as any },
+    });
+  }
+
+  const proj001Members = [
+    { id: "pm-prof-mouandza-demo", profileId: "prof-mouandza-demo", role: "Chef de projet", team: "Coordination",      status: "actif", createdAt: new Date("2025-03-30") },
+    { id: "pm-prof-marie-demo",    profileId: "prof-marie-demo",    role: "Responsable",    team: "Pédagogie",         status: "actif", createdAt: new Date("2025-04-02") },
+    { id: "pm-prof-kevin-demo",    profileId: "prof-kevin-demo",    role: "Responsable",    team: "Formation",         status: "actif", createdAt: new Date("2025-04-03") },
+    { id: "pm-prof-pauline-demo",  profileId: "prof-pauline-demo",  role: "Membre",         team: "Communication",     status: "actif", createdAt: new Date("2025-04-04") },
+    { id: "pm-prof-jean-demo",     profileId: "prof-jean-demo",     role: "Membre",         team: "Logistique",        status: "actif", createdAt: new Date("2025-04-05") },
+    { id: "pm-prof-sophie-demo",   profileId: "prof-sophie-demo",   role: "Membre",         team: "Suivi & Évaluation",status: "actif", createdAt: new Date("2025-04-06") },
+    { id: "pm-prof-alain-demo",    profileId: "prof-alain-demo",    role: "Membre",         team: "IT & Support",      status: "actif", createdAt: new Date("2025-04-07") },
+    { id: "pm-prof-linda-demo",    profileId: "prof-linda-demo",    role: "Membre",         team: "Finance",           status: "actif", createdAt: new Date("2025-04-08") },
+  ];
+  for (const pm of proj001Members) {
+    await prisma.projectMember.upsert({
+      where: { id: pm.id },
+      update: { role: pm.role, team: pm.team, status: pm.status },
+      create: { id: pm.id, projectId: "proj-001", profileId: pm.profileId, role: pm.role, team: pm.team, status: pm.status, createdAt: pm.createdAt },
+    });
+  }
+
+  // ─── Invitations en attente pour proj-001 ────────────────────────────────
+  const invitations = [
+    { id: "inv-001-1", email: "ornella.i@email.com", role: "Membre",     specialty: "Spécialiste contenu", createdAt: new Date("2025-05-12") },
+    { id: "inv-001-2", email: "daniel.m@email.com",  role: "Responsable",specialty: "Expert technique",   createdAt: new Date("2025-05-13") },
+    { id: "inv-001-3", email: "grace.l@email.com",   role: "Membre",     specialty: "Assistante projet",  createdAt: new Date("2025-05-13") },
+  ];
+  for (const inv of invitations) {
+    await prisma.projectInvitation.upsert({
+      where: { id: inv.id },
+      update: {},
+      create: { id: inv.id, projectId: "proj-001", email: inv.email, role: inv.role, specialty: inv.specialty, status: "pending", invitedByProfileId: "prof-mouandza-demo", createdAt: inv.createdAt },
     });
   }
 
@@ -203,6 +253,47 @@ async function main() {
     });
   }
 
+  // ─── Kevin : membre sur d'autres projets + tâches personnelles cross-projets ─
+  const kevinExtraProjects = [
+    { pid: "proj-005", pmId: "pm-kevin-p005", role: "Ingénieur terrain" },
+    { pid: "proj-007", pmId: "pm-kevin-p007", role: "Formateur" },
+    { pid: "proj-009", pmId: "pm-kevin-p009", role: "Coordinateur" },
+    { pid: "proj-011", pmId: "pm-kevin-p011", role: "Logisticien" },
+    { pid: "proj-012", pmId: "pm-kevin-p012", role: "Technicien" },
+    { pid: "proj-014", pmId: "pm-kevin-p014", role: "Analyste" },
+    { pid: "proj-016", pmId: "pm-kevin-p016", role: "Animateur" },
+  ];
+  for (const ep of kevinExtraProjects) {
+    await prisma.projectMember.upsert({
+      where: { id: ep.pmId },
+      update: {},
+      create: { id: ep.pmId, projectId: ep.pid, profileId: "prof-kevin-demo", role: ep.role },
+    });
+  }
+
+  const kevinTasks = [
+    { id: "task-k-01", title: "Analyser les besoins en énergie solaire",       projectId: "proj-005", status: "in_progress", priority: "high",   dueDate: d(5),   progress: 40,  desc: "Étude des besoins énergétiques des foyers cibles" },
+    { id: "task-k-02", title: "Préparer le plan de plantation",                 projectId: "proj-009", status: "todo",        priority: "normal", dueDate: d(10),  progress: 0,   desc: "Définir les espèces et les zones de plantation" },
+    { id: "task-k-03", title: "Créer les supports de cours niveau A1",          projectId: "proj-007", status: "in_progress", priority: "high",   dueDate: d(-2),  progress: 65,  desc: "Fiches pédagogiques et exercices d'alphabétisation" },
+    { id: "task-k-04", title: "Cartographier les points de collecte plastique", projectId: "proj-014", status: "todo",        priority: "normal", dueDate: d(15),  progress: 0,   desc: "Identifier 10 points stratégiques de collecte" },
+    { id: "task-k-05", title: "Planifier le tournoi intercommunal",              projectId: "proj-016", status: "paused",      priority: "normal", dueDate: d(8),   progress: 30,  desc: "Calendrier, règles et équipes participantes" },
+    { id: "task-k-06", title: "Sélectionner les ouvrages prioritaires",          projectId: "proj-011", status: "done",        priority: "low",    dueDate: d(-5),  progress: 100, desc: "Choix de 200 titres pour la médiathèque mobile" },
+    { id: "task-k-07", title: "Identifier les zones sans eau potable",           projectId: "proj-012", status: "in_progress", priority: "high",   dueDate: d(3),   progress: 55,  desc: "Cartographie des villages non desservis en eau" },
+    { id: "task-k-08", title: "Recruter les apprenants adultes",                 projectId: "proj-007", status: "todo",        priority: "low",    dueDate: d(20),  progress: 0,   desc: "Inscrire 40 adultes pour la première session" },
+  ];
+  for (const t of kevinTasks) {
+    await prisma.task.upsert({
+      where: { id: t.id },
+      update: { progress: t.progress, status: t.status as any },
+      create: {
+        id: t.id, title: t.title, description: t.desc,
+        profileId: "prof-kevin-demo", projectId: t.projectId,
+        status: t.status as any, priority: t.priority,
+        dueDate: t.dueDate, progress: t.progress,
+      },
+    });
+  }
+
   // ─── Stats (home page) ────────────────────────────────────────────────────
   const stats = [
     { key: "beneficiaires", value: "250+", label: "Bénéficiaires soutenus", icon: "Users", order: 1 },
@@ -247,7 +338,46 @@ async function main() {
     });
   }
 
-  console.log("✓ Seed terminé — 28 projets, 4 stats, 4 documents, 3 événements");
+  // ─── Articles ─────────────────────────────────────────────────────────────
+  const articles = [
+    { id: "art-001", title: "L'éducation numérique : un levier pour l'avenir",                 summary: "Comment le numérique transforme l'accès à l'éducation dans nos communautés.",                         category: "Éducation",    authorId: "prof-kevin-demo",    published: true,  views: 1250, likes: 186, date: "2025-04-30" },
+    { id: "art-002", title: "5 actions simples pour protéger notre environnement",              summary: "Des gestes quotidiens qui font une vraie différence pour notre planète.",                             category: "Environnement", authorId: "prof-pauline-demo",  published: true,  views: 980,  likes: 142, date: "2025-04-28" },
+    { id: "art-003", title: "Autonomisation des femmes : ensemble, bâtissons le changement",   summary: "Témoignages et initiatives qui transforment des vies.",                                               category: "Société",       authorId: "prof-marie-demo",    published: true,  views: 1560, likes: 234, date: "2025-04-25" },
+    { id: "art-004", title: "Énergie solaire : une solution durable pour tous",                 summary: "Focus sur les avantages et les projets en cours dans nos régions.",                                   category: "Innovation",    authorId: "prof-kevin-demo",    published: true,  views: 1100, likes: 168, date: "2025-04-22" },
+    { id: "art-005", title: "Pourquoi la participation citoyenne est essentielle",              summary: "Impliquer chaque citoyen pour construire un avenir meilleur.",                                        category: "Engagement",    authorId: "prof-jean-demo",     published: false, views: 0,    likes: 0,   date: "2025-04-18" },
+    { id: "art-006", title: "Les jeunes, acteurs clés du développement communautaire",          summary: "Portraits et initiatives portées par la jeunesse locale.",                                            category: "Jeunesse",      authorId: "prof-alain-demo",    published: true,  views: 870,  likes: 123, date: "2025-04-15" },
+    { id: "art-007", title: "Microfinance et entrepreneuriat : vers l'autonomie économique",    summary: "Les micro-crédits changent des trajectoires dans les zones rurales.",                                 category: "Innovation",    authorId: "prof-mouandza-demo", published: true,  views: 720,  likes: 98,  date: "2025-04-12" },
+    { id: "art-008", title: "Santé communautaire : prévention et sensibilisation",              summary: "Agir en amont pour réduire les maladies évitables dans nos quartiers.",                              category: "Société",       authorId: "prof-sophie-demo",   published: true,  views: 640,  likes: 89,  date: "2025-04-10" },
+    { id: "art-009", title: "Reforestation au Gabon : l'urgence d'agir",                        summary: "Un million d'arbres à planter, un objectif national ambitieux.",                                      category: "Environnement", authorId: "prof-pauline-demo",  published: true,  views: 1340, likes: 210, date: "2025-04-08" },
+    { id: "art-010", title: "L'alphabétisation des adultes : un enjeu majeur",                  summary: "Réduire l'analphabétisme, c'est ouvrir des portes à des millions de personnes.",                     category: "Éducation",     authorId: "prof-marie-demo",    published: true,  views: 490,  likes: 67,  date: "2025-04-05" },
+    { id: "art-011", title: "Inclusion numérique : former pour ne laisser personne de côté",    summary: "Des initiatives pour que le digital profite à tous.",                                                 category: "Innovation",    authorId: "prof-kevin-demo",    published: false, views: 0,    likes: 0,   date: "2025-04-02" },
+    { id: "art-012", title: "Sport et valeurs : le football comme outil d'inclusion sociale",   summary: "Comment le sport peut rassembler et transformer des communautés entières.",                           category: "Jeunesse",      authorId: "prof-alain-demo",    published: true,  views: 780,  likes: 104, date: "2025-03-30" },
+    { id: "art-013", title: "Coopératives féminines : quand les femmes dirigent",               summary: "Des modèles économiques portés par des femmes et qui font leurs preuves.",                            category: "Société",       authorId: "prof-marie-demo",    published: true,  views: 920,  likes: 145, date: "2025-03-27" },
+    { id: "art-014", title: "Agriculture durable : nourrir la population sans épuiser la terre","summary": "Techniques innovantes pour une agriculture respectueuse de l'environnement.",                       category: "Environnement", authorId: "prof-mouandza-demo", published: true,  views: 560,  likes: 82,  date: "2025-03-24" },
+    { id: "art-015", title: "Bénévolat : s'engager pour sa communauté",                         summary: "Pourquoi et comment donner de son temps pour une cause qui a du sens.",                               category: "Engagement",    authorId: "prof-jean-demo",     published: true,  views: 430,  likes: 58,  date: "2025-03-20" },
+    { id: "art-016", title: "Accès à l'eau potable : des solutions concrètes",                  summary: "Des technologies simples et peu coûteuses pour garantir l'accès à l'eau.",                           category: "Innovation",    authorId: "prof-sophie-demo",   published: true,  views: 690,  likes: 91,  date: "2025-03-17" },
+    { id: "art-017", title: "Leadership féminin : briser le plafond de verre au Gabon",         summary: "Des femmes qui prennent leur place dans les instances de décision.",                                  category: "Société",       authorId: "prof-marie-demo",    published: false, views: 0,    likes: 0,   date: "2025-03-14" },
+    { id: "art-018", title: "Le recyclage plastique : une opportunité économique locale",        summary: "Transformer les déchets en ressources : des entreprises sociales montrent la voie.",                 category: "Environnement", authorId: "prof-pauline-demo",  published: true,  views: 810,  likes: 117, date: "2025-03-10" },
+    { id: "art-019", title: "Former les formateurs : clé de la réplication des savoirs",        summary: "Un investissement dans les compétences humaines qui démultiplie l'impact.",                           category: "Éducation",     authorId: "prof-kevin-demo",    published: true,  views: 380,  likes: 52,  date: "2025-03-07" },
+    { id: "art-020", title: "Volontariat international : retours d'expériences",                summary: "Ils ont donné de leur temps à l'étranger et en sont revenus transformés.",                           category: "Engagement",    authorId: "prof-jean-demo",     published: true,  views: 510,  likes: 73,  date: "2025-03-03" },
+  ];
+
+  for (const a of articles) {
+    await prisma.article.upsert({
+      where: { id: a.id },
+      update: { views: a.views, likes: a.likes, published: a.published },
+      create: {
+        id: a.id, title: a.title, summary: a.summary,
+        content: `<p>${a.summary}</p><p>Contenu complet de l'article à venir...</p>`,
+        category: a.category, published: a.published,
+        views: a.views, likes: a.likes,
+        authorProfileId: a.authorId,
+        date: new Date(a.date), createdAt: new Date(a.date),
+      },
+    });
+  }
+
+  console.log("✓ Seed terminé — 28 projets, 4 stats, 4 documents, 3 événements, 20 articles");
 }
 
 main()

@@ -6,7 +6,7 @@ import { requireAuthApi } from "@/lib/auth-middleware";
 const updateSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   description: z.string().optional().nullable(),
-  status: z.enum(["todo", "in_progress", "done", "review"]).optional(),
+  status: z.enum(["todo", "in_progress", "paused", "done", "review"]).optional(),
   dueDate: z.string().datetime().optional().nullable(),
   priority: z.enum(["low", "normal", "high"]).optional(),
   projectId: z.string().optional().nullable(),

@@ -16,7 +16,7 @@ const navItems = [
   { href: "/dashboard/espace-personnel", icon: User, label: "Espace personnel" },
   { href: "/dashboard/projets", icon: FolderOpen, label: "Projets" },
   { href: "/dashboard/taches", icon: CheckSquare, label: "Mes tâches" },
-  { href: "/actualites", icon: Newspaper, label: "Articles" },
+  { href: "/dashboard/articles", icon: Newspaper, label: "Articles" },
   { href: "/dashboard/participations", icon: Star, label: "Mes participations" },
   { href: "/evenements", icon: CalendarDays, label: "Événements" },
   { href: "/dashboard/notifications", icon: Bell, label: "Notifications", badge: true },

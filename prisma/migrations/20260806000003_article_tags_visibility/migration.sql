@@ -1,0 +1,2 @@
+ALTER TABLE "articles" ADD COLUMN IF NOT EXISTS "tags"       TEXT[]  NOT NULL DEFAULT '{}';
+ALTER TABLE "articles" ADD COLUMN IF NOT EXISTS "visibility" TEXT    NOT NULL DEFAULT 'public';
