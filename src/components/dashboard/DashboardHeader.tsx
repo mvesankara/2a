@@ -13,6 +13,7 @@ const pageTitles: Record<string, string> = {
   "/my-space": "Espace personnel",
   "/dashboard/taches":   "Mes tâches",
   "/dashboard/articles": "Articles",
+  "/dashboard/participations": "Mes participations",
   "/dashboard/notifications": "Notifications",
   "/dashboard/messages": "Messages",
   "/dashboard/paiements": "Paiements",

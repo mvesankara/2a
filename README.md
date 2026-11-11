@@ -1,53 +1,84 @@
-Node.js and npm installed on your machine. You can use [nvm](ht
-     ```sh
-     cd <YOUR_PROJECT_NAME>
-     ```
- 3.  **Install NPM packages**
-     ```sh
-     npm install
-     ```
- 4.  **Set up Supabase**
-     - This project uses Supabase for authentication. You will need to create a `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in a `.env` file in the root of the project.
-     - You can get these keys from your Supabase project dashboard.
-     ```
-     VITE_SUPABASE_URL=your_supabase_url
-     VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-     ```
- 
- ### Usage
- 
- To run the app in development mode, use the following command:
- 
- ```sh
- npm run dev
- ```
- 
- This will start the development server and you can view the application in your browser at `http://localhost:5173` (the port may vary).
- 
- ### Email Confirmation
+# 2A – Acteurs de l'Avenir
 
- When creating an account, a confirmation email is sent via Supabase. You must validate your address before accessing protected pages such as `MySpace`. After login, unverified users are redirected to the `/verify-email` page where they can request a new confirmation email.
- 
- ## Project Structure
- 
- The project has been simplified to its core components:
- 
- -   **`src/`**: Contains all the source code.
-(`Index`, `Login`, `MySpace`, `NotFound`, `ResetPassword`).
-     -   **`pages/`**: Contains the main pages of the application (`Index`, `Login`, `MySpace`, `VerifyEmail`, `NotFound`, `ResetPassword`).
-     -   **`components/`**: Contains the reusable UI components.
-     -   **`hooks/`**: Contains custom React hooks.
-     -   **`integrations/`**: Contains the Supabase client configuration.
- -   **`public/`**: Contains public assets.
- -   **`README.md`**: This file.
- 
- ## What was removed?
- 
- This project has been simplified from a much larger application. The following features have been removed:
- - Admin dashboard
- - Articles and news section
- - Community features (members, events, projects)
- - Payment integration
- - Complex user profiles
- 
- The goal of this simplification is to provide a clean and simple starting point for a new project.
+Application web de gestion associative pour **2A – Acteurs de l'Avenir** (Libreville, Gabon) : site vitrine, adhésion en ligne, espace membre, gestion de projets, tâches et articles.
+
+## Stack technique
+
+- **Next.js 15** (App Router) + **TypeScript**
+- **Prisma ORM** + **PostgreSQL** (via Docker Compose)
+- **shadcn/ui** (Radix UI) + **Tailwind CSS**
+- **Auth maison par JWT** (bcryptjs + jsonwebtoken, token en cookie + localStorage)
+- **TanStack Query** pour le data fetching côté client
+
+## Installation
+
+1. **Prérequis** : Node.js et npm installés sur votre machine (voir [nvm](https://github.com/nvm-sh/nvm)).
+
+2. **Installer les dépendances**
+   ```sh
+   npm install
+   ```
+
+3. **Configurer l'environnement**
+
+   Copier `.env.example` en `.env` et renseigner les variables :
+   ```
+   DATABASE_URL="postgresql://user:password@localhost:5433/dbname"
+   JWT_SECRET=change_this_to_a_long_random_secret_in_production
+   JWT_EXPIRES_IN=7d
+   ```
+
+4. **Démarrer la base de données** (PostgreSQL via Docker)
+   ```sh
+   npm run db:up
+   ```
+
+5. **Appliquer les migrations Prisma**
+   ```sh
+   npm run db:migrate
+   ```
+
+6. **(Optionnel) Peupler la base avec des données de départ**
+   ```sh
+   npm run db:seed
+   ```
+
+### Usage
+
+Démarrer le serveur de développement :
+
+```sh
+npm run dev
+```
+
+L'application est accessible sur `http://localhost:3000`.
+
+Autres commandes utiles :
+
+```sh
+npm run build       # build de production
+npm run start       # démarre le build de production
+npm run lint        # lint du projet
+npm run db:studio   # ouvre Prisma Studio
+npm run db:down     # arrête la base de données Docker
+```
+
+### Confirmation d'email
+
+À l'inscription, le compte est créé avec le statut `pending` et doit être vérifié. En développement, les emails (vérification, réinitialisation de mot de passe) sont simplement loggés en console (`src/lib/email.ts`) ; un provider SMTP reste à configurer pour la production.
+
+## Structure du projet
+
+- **`app/`** : routes Next.js (App Router)
+  - pages publiques : accueil, `/login`, `/devenir-membre`, `/projets`, réinitialisation de mot de passe, vérification d'email
+  - `dashboard/` : espace membre protégé (profil, tâches, projets, articles, espace personnel)
+  - `api/` : routes API (auth, profil, adhésion, projets, tâches, articles, notifications, stats, newsletter)
+- **`src/components/`** : composants UI réutilisables (shadcn/ui, dashboard, projets, adhésion, auth…)
+- **`src/hooks/`** : hooks React (auth, permissions, notifications…)
+- **`src/lib/`** : client API, JWT, middleware d'auth API, client Prisma, utilitaire email
+- **`prisma/`** : schéma, migrations et script de seed
+- **`public/`** : assets statiques
+
+## Rôles et permissions
+
+Les rôles membres (`adherent`, `membre_bureau`, `sympathisant`, `administrateur`) sont définis par l'enum Prisma `UserRole` et repris côté frontend dans `src/types/roles.ts`. Le rôle `administrateur` a tous les droits ; les autorisations fines sur les projets (créateur, "Chef de projet", etc.) sont gérées au cas par cas dans les routes API concernées.

@@ -1,9 +1,13 @@
 export enum UserRole {
-  ADMIN = "ADMIN",
-  MEMBER = "MEMBER",
+  ADHERENT = "adherent",
+  MEMBRE_BUREAU = "membre_bureau",
+  SYMPATHISANT = "sympathisant",
+  ADMINISTRATEUR = "administrateur",
 }
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  [UserRole.ADMIN]: ["*"],
-  [UserRole.MEMBER]: [],
+  [UserRole.ADMINISTRATEUR]: ["*"],
+  [UserRole.MEMBRE_BUREAU]: [],
+  [UserRole.ADHERENT]: [],
+  [UserRole.SYMPATHISANT]: [],
 };
